@@ -57,8 +57,8 @@
 )
 
 ;; replace-pos 
-;  replaces a position in the board for val
-;  returns a row(list) with element in column(col) position replaced by the val
+;  replaces a position in the board for the val
+;  returns a row with element in column(col) position replaced by the val
 (defun replace-pos (col row &optional (val 1))
     "Col (column) must be a number between 0 and the row length"
     (cond 
@@ -80,25 +80,6 @@
   )
 )
 
-;; replace-multi-pos
-;  replaces multiple positions in the board
-(defun replace-multi-pos (pos-list board &optional (val 1))
-    (cond 
-      ((null pos-list) board)
-      (t (replace-multi-pos (cdr pos-list) (replace- (first (car pos-list)) (second (car pos-list)) board val)))
-    )
-)
-
-;; insert-piece
-;  uses the piece-taken-elems to push pieces into the board
-(defun insert-piece (row col board piece)
-  (cond 
-    ((or (> row (length board))  (< row 0) (< col 0) (> col (length board))) nil)
-    ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col piece))))
-    (replace-multi-pos (piece-taken-elems row col piece) board) )
-    (t nil)
-   )
-)
 
 ;;; Operators
 
@@ -110,35 +91,24 @@
    ((equal piece 'peca-b)                                  
     (list (list row col) (list row (1+ col)) (list (1+ row) col) (list (1+ row) (1+ col)))         
     )
-   ((equal piece 'peca-c-2) 
+   ((equal piece 'peca-c-1) 
     (list (list row col) (list (1+ row) col) (list (1+ row) (1+ col)) (list (+ row 2) (1+ col)))  
     ) 
-   ((equal piece 'peca-c-1) (list (list row col) (list row (1+ col)) (list (1- row) (1+ col)) (list (1- row) (+ col 2))))
+   ((equal piece 'peca-c-2) (list (list row col) (list row (1+ col)) (list (1- row) (1+ col)) (list (1- row) (+ col 2))))
    (t nil)
    )
 )
 
-
 ;; piece-a
+;  uses the piece-taken-elems to push a 'peca-a' into the board
 ;  returns 
 (defun piece-a (row col board)
-  (insert-piece row col board 'peca-a)
+  (cond 
+    ((or (> row (length board))  (< row 0) (< col 0) (> col (length board))) nil)
+    ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col 'peca-a)))) (replace- row col board))
+    (t nil)
+    )
+
 )
 
-;; piece-b
-;
-(defun piece-b (row col board)
-   (insert-piece row col board 'peca-b)
-)
 
-;; piece-c-1
-;
-(defun piece-c-1 (row col board)
-  (insert-piece row col board 'peca-c-1)
-)
-
-;; piece-c-2
-;
-(defun piece-c-2 (row col board)
-  (insert-piece row col board 'peca-c-2)
-)
