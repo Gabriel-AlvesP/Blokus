@@ -41,6 +41,7 @@
 (defun empty-elemp(row col board)
   "row and col must be numbers between 0 and the board dimension"
   (cond 
+  ((or (< row 0) (> row (length board)) (< col 0) (> col (length board))) nil)
   ((= (element row col board) 0) t)
   (t nil)
   )
