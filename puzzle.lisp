@@ -285,8 +285,30 @@
 
 ;; solutionp 
 ;  solution state = at least x elems inserted
-;  returns a solution node 
-(defun solutionp(check-taken-elems node)
+;  returns a solution node
+;  ex:(solutionp (cells-pieces-by-row (board-a)))
+(defun solutionp (board)    
+    (if (null board) 0 (+ (first board) (solutionp (rest board))))   
 )
 
+;; row-count-cells-pieces
+;  Count the pieces cells in the list
+;  returns number of pieces cells in the list
+(defun row-count-cells-pieces(board)
+  (cond
+    ((null board) 0)
+    ((= (first board) 1) (1+ (row-count-cells-pieces (cdr board))))
+    (t (row-count-cells-pieces (cdr board)))
+    )
+)
+
+;; cells-pieces-by-row
+;  Receive a list with sublists and count the pieces cells by list
+;  return a list with number of pieces cells by list
+(defun cells-pieces-by-row (board)
+  (cond 
+    ((null board) nil)
+    (t (cons (row-count-cells-pieces (car board)) (cells-pieces-by-row (cdr board))))
+  )
+)
 
