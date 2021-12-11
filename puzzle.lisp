@@ -203,6 +203,7 @@
 (defun insert-piece (row col board piece)
   (cond 
     ((or (> row (length board))  (< row 0) (< col 0) (> col (length board))) nil)
+    ((not (check-adjacent-elems row col board piece)) nil)
     ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col piece))))
     (replace-multi-pos (piece-taken-elems row col piece) board))
     (t nil)
@@ -213,6 +214,24 @@
 ;  check if adjacente elements/cells are taken (1, 2 or +)
 ;  if, in fact, they are taken then returns null
 ;  else 
+(defun check-adjacent-elems (row col board piece)
+  (cond
+   ((eval (cons 'or (check-empty-elems board (piece-adjacent-elems row col piece) 1))) nil)
+   (t t)
+   )
+)
+
+;; piece-adjacent-elems
+;  returns a list wirh all adjacent elements/cells that a particular  piece takes in a board
+(defun piece-adjacent-elems (row col piece)
+  (cond
+   ((equal piece 'peca-a) (list (list row (1+ col)) (list row (1- col)) (list (1+ row) col) (list (1- row) col)))
+   ((equal piece 'peca-b) (list (list row (1- col)) (list (1+ row) (1- col)) (list (1- row) col) (list (1- row) (1+ col)) (list (+ row 2) col) (list (+ row 2) (1+ col)) (list row (+ col 2)) (list (1+ row) (+ col 2))))
+   ((equal piece 'peca-c-1) (list (list (1- row) col) (list row (1- col)) (list (1+ row) col) (list (1+ row) (1+ col)) (list row (+ col 2)) (list (1- row) (+ col 3)) (list (1- row) (+ col 2)) (list (1- row) (1+ col))))
+   ((equal piece 'peca-c-2) (list (list (1- row) col) (list row (1- col)) (list row (1+ col)) (list (1+ row) (1- col)) (list (1+ row) (+ col 2)) (list (+ row 2) col) (list (+ row 2) (+ col 2)) (list (+ row 3) (1+ col))))
+   (t nil)
+   )
+)
 
 
 
