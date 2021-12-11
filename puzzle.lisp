@@ -83,6 +83,8 @@
 
 ;; replace-multi-pos
 ;  replaces multiple positions in the board
+;  pos-list => list with all positions to replace
+;  returns the all board with all elements replaced 
 (defun replace-multi-pos (pos-list board &optional (val 1))
     (cond 
       ((null pos-list) board)
@@ -100,6 +102,12 @@
     (t nil)
    )
 )
+
+;; check-adjacent-elems
+;  check if adjacente elements/cells are taken (1, 2 or +)
+;  if, in fact, they are taken then returns null
+;  else replace the adjacent elems 
+
 
 ;;; Operators
 
