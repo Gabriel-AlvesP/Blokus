@@ -5,14 +5,10 @@
 
 
 
-
-
-
-
-;;; Board
+;;; Problems
 
 ;; Problem A
-;; pelo menos 8 casas preenchidas
+;; At least 8 elements fulfilled
 (defun board-a()
     ;A B C D E F G H I J K L M N
   '((0 0 0 0 2 2 2 2 2 2 2 2 2 2)
@@ -32,7 +28,7 @@
 )
 
 ;; Problem b
-;; pelo menos 20 casas preenchidas
+;; At least 20 elements fulfilled
 (defun board-b()
     ;A B C D E F G H I J K L M N
   '((0 0 0 0 0 0 0 2 2 2 2 2 2 2)
@@ -52,7 +48,7 @@
 )
 
 ;; Problem c
-;; pelo menos 28 casas preenchidas
+;; At least 28 elements fulfilled
 (defun board-c()
     ;A B C D E F G H I J K L M N
   '((0 0 2 0 0 0 0 0 0 2 2 2 2 2) ;1
@@ -72,7 +68,7 @@
 )
 
 ;; Problem d
-;; pelo menos 36 casas preenchidas
+;; At least 36 elements fulfilled
 (defun board-d()
     ;A B C D E F G H I J K L M N
   '((0 0 0 0 0 0 0 0 0 0 0 0 0 0) ;1
@@ -92,7 +88,7 @@
 )
 
 ;; Problem e
-;; pelo menos 44 casas preenchidas
+;; At least 44 elements fulfilled
 (defun board-e()
     ;A B C D E F G H I J K L M N
   '((0 2 2 2 2 2 2 2 2 2 2 2 2 2) ;1
@@ -111,7 +107,10 @@
     (2 2 2 2 2 2 2 2 2 2 2 2 2 2));14
 )
 
+;;; Board
+
 ;; Problem f
+;; At least 72 elements fulfilled
 ;; Empty Board 14x14 
 ;  Returns a 14x14 empty board 
 (defun empty-board (&optional (dimension 14))
@@ -143,7 +142,7 @@
 ;;; Secondary functions
 
 ;; empty-elemp
-;  returns t if a board element is empty and nil if it isn't
+;  returns t if a board element is empty(or the value - val) and nil if it isn't
 (defun empty-elemp(row col board &optional (val 0))
   "row and col must be numbers between 0 and the board dimension"
   (cond 
