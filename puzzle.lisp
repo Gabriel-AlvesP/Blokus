@@ -4,8 +4,114 @@
 ;;;; Andre Serrado - 201900318
 
 
+
+
+
+
+
 ;;; Board
 
+;; Problem A
+;; pelo menos 8 casas preenchidas
+(defun board-a()
+    ;A B C D E F G H I J K L M N
+  '((0 0 0 0 2 2 2 2 2 2 2 2 2 2)
+    (0 0 0 0 2 2 2 2 2 2 2 2 2 2)
+    (0 0 0 0 2 2 2 2 2 2 2 2 2 2)
+    (0 0 0 0 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2))
+)
+
+;; Problem b
+;; pelo menos 20 casas preenchidas
+(defun board-b()
+    ;A B C D E F G H I J K L M N
+  '((0 0 0 0 0 0 0 2 2 2 2 2 2 2)
+    (0 0 0 0 0 0 0 2 2 2 2 2 2 2)
+    (0 0 0 0 0 0 0 2 2 2 2 2 2 2)
+    (0 0 0 0 0 0 0 2 2 2 2 2 2 2)
+    (0 0 0 0 0 0 0 2 2 2 2 2 2 2)
+    (0 0 0 0 0 0 0 2 2 2 2 2 2 2)
+    (0 0 0 0 0 0 0 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2)
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2))
+)
+
+;; Problem c
+;; pelo menos 28 casas preenchidas
+(defun board-c()
+    ;A B C D E F G H I J K L M N
+  '((0 0 2 0 0 0 0 0 0 2 2 2 2 2) ;1
+    (0 0 0 2 0 0 0 0 0 2 2 2 2 2) ;2
+    (0 0 0 0 2 0 0 0 0 2 2 2 2 2) ;3
+    (0 0 0 0 0 2 0 0 0 2 2 2 2 2) ;4
+    (0 0 0 0 0 0 2 0 0 2 2 2 2 2) ;5
+    (0 0 0 0 0 0 0 2 0 2 2 2 2 2) ;6
+    (0 0 0 0 0 0 0 0 2 2 2 2 2 2) ;7
+    (0 0 0 0 0 0 0 0 0 2 2 2 2 2) ;8
+    (0 0 0 0 0 0 0 0 0 2 2 2 2 2) ;9
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2) ;10
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2) ;11
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2) ;12
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2) ;13
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2));14
+)
+
+;; Problem d
+;; pelo menos 36 casas preenchidas
+(defun board-d()
+    ;A B C D E F G H I J K L M N
+  '((0 0 0 0 0 0 0 0 0 0 0 0 0 0) ;1
+    (0 0 0 0 0 0 0 0 0 0 0 0 0 0) ;2
+    (0 0 0 0 0 0 0 0 0 0 0 0 0 0) ;3
+    (0 0 0 0 0 0 0 0 0 0 0 0 0 0) ;4
+    (0 0 0 0 0 0 0 0 0 0 0 0 0 0) ;5
+    (0 0 0 0 0 0 0 0 0 0 0 0 0 0) ;6
+    (0 0 0 0 0 0 0 0 0 0 0 0 0 0) ;7
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2) ;8
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2) ;9
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2) ;10
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2) ;11
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2) ;12
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2) ;13
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2));14
+)
+
+;; Problem e
+;; pelo menos 44 casas preenchidas
+(defun board-e()
+    ;A B C D E F G H I J K L M N
+  '((0 2 2 2 2 2 2 2 2 2 2 2 2 2) ;1
+    (2 0 2 0 0 0 0 0 0 2 0 0 0 2) ;2
+    (2 0 0 2 0 0 0 0 0 0 2 0 0 2) ;3
+    (2 0 0 0 2 0 0 0 0 0 0 2 0 2) ;4
+    (2 0 0 0 0 2 0 0 0 0 0 0 2 2) ;5
+    (2 0 0 0 0 0 2 0 0 0 0 0 0 2) ;6
+    (2 0 0 0 0 0 0 2 0 0 0 0 0 2) ;7
+    (2 0 0 0 0 0 0 0 2 0 0 0 0 2) ;8
+    (2 0 0 0 0 0 0 0 0 2 0 0 0 2) ;9
+    (2 0 2 0 0 0 0 0 0 0 2 0 0 2) ;10
+    (2 2 0 0 0 0 0 0 0 0 0 2 0 2) ;11
+    (2 0 0 0 2 0 0 0 0 0 0 0 2 2) ;12
+    (2 0 0 0 0 2 0 0 0 0 0 0 0 2) ;13
+    (2 2 2 2 2 2 2 2 2 2 2 2 2 2));14
+)
+
+;; Problem f
 ;; Empty Board 14x14 
 ;  Returns a 14x14 empty board 
 (defun empty-board (&optional (dimension 14))
@@ -38,11 +144,11 @@
 
 ;; empty-elemp
 ;  returns t if a board element is empty and nil if it isn't
-(defun empty-elemp(row col board)
+(defun empty-elemp(row col board &optional (val 0))
   "row and col must be numbers between 0 and the board dimension"
   (cond 
   ((or (< row 0) (> row (length board)) (< col 0) (> col (length board))) nil)
-  ((= (element row col board) 0) t)
+  ((= (element row col board) val) t)
   (t nil)
   )
 )
@@ -51,10 +157,10 @@
 ;  checks if each element of indexes-list is empty or not in the board
 ;  indexes-list - ex -  ((0 0) (0 2) (4 2))
 ;  returns a list of t and nil depending on each index  
-(defun check-empty-elems(board indexes-list)
+(defun check-empty-elems(board indexes-list &optional (val 0))
   "Each element(list with row and col) in indexes-list
    must contain a valid number for the row and column < (length board)"
-  (mapcar (lambda (index) (empty-elemp (first index) (second index) board)) indexes-list)
+  (mapcar (lambda (index) (empty-elemp (first index) (second index) board val)) indexes-list)
 )
 
 ;; replace-pos 
@@ -106,7 +212,7 @@
 ;; check-adjacent-elems
 ;  check if adjacente elements/cells are taken (1, 2 or +)
 ;  if, in fact, they are taken then returns null
-;  else replace the adjacent elems 
+;  else 
 
 
 ;;; Operators
