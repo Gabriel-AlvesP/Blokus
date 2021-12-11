@@ -146,7 +146,7 @@
 (defun empty-elemp(row col board &optional (val 0))
   "row and col must be numbers between 0 and the board dimension"
   (cond 
-  ((or (< row 0) (> row (length board)) (< col 0) (> col (length board))) nil)
+  ((or (< row 0) (> row (1- (length board))) (< col 0) (> col (1-(length board)))) nil)
   ((= (element row col board) val) t)
   (t nil)
   )
@@ -161,6 +161,7 @@
    must contain a valid number for the row and column < (length board)"
   (mapcar (lambda (index) (empty-elemp (first index) (second index) board val)) indexes-list)
 )
+
 
 ;; replace-pos 
 ;  replaces a position in the board for val
@@ -214,7 +215,6 @@
 ;  else 
 
 
-;;; Operators
 
 ;; piece-taken-elems 
 ;  returns a list with all elements/cells that a particular piece takes in a board
@@ -232,6 +232,13 @@
    )
 )
 
+;;; Operators
+
+;; operations
+;  returns a list with all operations
+(defun operations()
+  (list 'piece-a 'piece-b 'piece-c-1 'piece-c-2)
+)
 
 ;; piece-a
 ;  returns 
@@ -256,3 +263,11 @@
 (defun piece-c-2 (row col board)
   (insert-piece row col board 'peca-c-2)
 )
+
+;; solutionp 
+;  solution state = at least x elems inserted
+;  returns a solution node 
+(defun solutionp(check-taken-elems node)
+)
+
+
