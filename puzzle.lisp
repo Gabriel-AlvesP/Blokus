@@ -96,7 +96,7 @@
   (cond 
     ((or (> row (length board))  (< row 0) (< col 0) (> col (length board))) nil)
     ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col piece))))
-    (replace-multi-pos (piece-taken-elems row col piece) board) )
+    (replace-multi-pos (piece-taken-elems row col piece) board))
     (t nil)
    )
 )
