@@ -203,17 +203,25 @@
 ;  returns a list with all elements/cells that a particular piece takes in a board
 (defun piece-taken-elems (row col piece) 
   (cond 
-   ((equal piece 'peca-a) (cons (list row col) nil))                                            
-   ((equal piece 'peca-b)                                  
+   ((equal piece 'piece-a) (cons (list row col) nil))                                            
+   ((equal piece 'piece-b)                                  
     (list (list row col) (list row (1+ col)) (list (1+ row) col) (list (1+ row) (1+ col)))         
     )
-   ((equal piece 'peca-c-2) 
+   ((equal piece 'piece-c-2) 
     (list (list row col) (list (1+ row) col) (list (1+ row) (1+ col)) (list (+ row 2) (1+ col)))  
     ) 
-   ((equal piece 'peca-c-1) (list (list row col) (list row (1+ col)) (list (1- row) (1+ col)) (list (1- row) (+ col 2))))
+   ((equal piece 'piece-c-1) (list (list row col) (list row (1+ col)) (list (1- row) (1+ col)) (list (1- row) (+ col 2))))
    (t nil)
    )
 )
+
+
+;; remove-nil 
+;  remove all 'nil elements in a list
+(defun remove-nil(list)
+   (apply #'append (mapcar #'(lambda(x) (if (null x) nil (list x))) list))
+)
+
 
 ;;;  Board Verifications
 
@@ -232,48 +240,12 @@
 ;  returns a list wirh all adjacent elements/cells that a particular  piece takes in a board
 (defun piece-adjacent-elems (row col piece)
   (cond
-   ((equal piece 'peca-a) (list (list row (1+ col)) (list row (1- col)) (list (1+ row) col) (list (1- row) col)))
-   ((equal piece 'peca-b) (list (list row (1- col)) (list (1+ row) (1- col)) (list (1- row) col) (list (1- row) (1+ col)) (list (+ row 2) col) (list (+ row 2) (1+ col)) (list row (+ col 2)) (list (1+ row) (+ col 2))))
-   ((equal piece 'peca-c-1) (list (list (1- row) col) (list row (1- col)) (list (1+ row) col) (list (1+ row) (1+ col)) (list row (+ col 2)) (list (1- row) (+ col 3)) (list (1- row) (+ col 2)) (list (1- row) (1+ col))))
-   ((equal piece 'peca-c-2) (list (list (1- row) col) (list row (1- col)) (list row (1+ col)) (list (1+ row) (1- col)) (list (1+ row) (+ col 2)) (list (+ row 2) col) (list (+ row 2) (+ col 2)) (list (+ row 3) (1+ col))))
+   ((equal piece 'piece-a) (list (list row (1+ col)) (list row (1- col)) (list (1+ row) col) (list (1- row) col)))
+   ((equal piece 'piece-b) (list (list row (1- col)) (list (1+ row) (1- col)) (list (1- row) col) (list (1- row) (1+ col)) (list (+ row 2) col) (list (+ row 2) (1+ col)) (list row (+ col 2)) (list (1+ row) (+ col 2))))
+   ((equal piece 'piece-c-1) (list (list (1- row) col) (list row (1- col)) (list (1+ row) col) (list (1+ row) (1+ col)) (list row (+ col 2)) (list (1- row) (+ col 3)) (list (1- row) (+ col 2)) (list (1- row) (1+ col))))
+   ((equal piece 'piece-c-2) (list (list (1- row) col) (list row (1- col)) (list row (1+ col)) (list (1+ row) (1- col)) (list (1+ row) (+ col 2)) (list (+ row 2) col) (list (+ row 2) (+ col 2)) (list (+ row 3) (1+ col))))
    (t nil)
    )
-)
-
-
-; ---------------------------------
-
-;;; Pieces
-
-;; insert-piece
-;  uses the piece-taken-elems to push pieces into the board
-#|(defun insert-piece (row col board piece) 
-  (cond 
-    ((or (> row (length board)) (< row 0) (< col 0) (> col (length board))) nil)
-    ((not (check-adjacent-elems row col board piece)) nil)
-    ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col piece))))
-    (replace-multi-pos (piece-taken-elems row col piece) board))
-    (t nil)
-   )
-)|#
-; test => (insert-piece (init-pieces) 13 13 (empty-board) 'peca-a)
-(defun insert-piece (pieces-list row col board piece) 
-  (cond 
-    ((null (can-placep pieces-list board row col piece)) nil)
-    (t (replace-multi-pos (piece-taken-elems row col piece) board)))
-   )
-
-;; left-pieces
-;  pieces-list= list with all pieces left to play
-;  returns how many pieces are left per type 
-;  test => (left-pieces (init-pieces) 'piece-a) 
-;  result => 10
-(defun left-pieces(pieces-list piece-type)
-  (cond 
-    ((equal piece-type 'piece-a)(first pieces-list))
-    ((equal piece-type 'piece-b) (second pieces-list))
-    (t (third pieces-list))
-  )
 )
 
 ;; can-place-piecep
@@ -281,11 +253,47 @@
 ;  result => nil
 (defun can-placep (pieces-list board row col piece)
   (cond 
-    ((= 0 (left-pieces pieces-list piece)) nil)
+    ((= 0 (pieces-left-numb pieces-list piece)) nil)
     ((or (> row (length board)) (< row 0) (< col 0) (> col (length board))) nil)
     ((not (check-adjacent-elems row col board piece)) nil)
     ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col piece))))t)
     (t nil)
+  )
+)
+
+;; check-all-board
+;  returns a list with all indexes in the board
+(defun check-all-board(board row col)
+  (cond 
+    ((< row 0) nil)
+    ((< col 0) (check-all-board board (1- row) (1- (length board))))
+    (t (cons (list row col) (check-all-board board row (1- col))))
+  )
+)
+
+; ---------------------------------
+
+;;; Pieces
+
+;; insert-piece
+;  uses the piece-taken-elems to push pieces into the board
+; test => (insert-piece (init-pieces) 13 13 (empty-board) 'piece-a)
+(defun insert-piece (pieces-list row col board piece) 
+  (cond 
+    ((null (can-placep pieces-list board row col piece)) nil)
+    (t (replace-multi-pos (piece-taken-elems row col piece) board)))
+   )
+
+;; pieces-left-numb
+;  pieces-list= list with all pieces left to play
+;  returns how many pieces are left per type 
+;  test => (pieces-left-numb (init-pieces) 'piece-a) 
+;  result => 10
+(defun pieces-left-numb(pieces-list piece-type)
+  (cond 
+    ((equal piece-type 'piece-a)(first pieces-list))
+    ((equal piece-type 'piece-b) (second pieces-list))
+    (t (third pieces-list))
   )
 )
 
@@ -301,33 +309,31 @@
   )
 )
 
-
-;; possible-pos-per-piece
-;  returns a list of indexes where a specified piece can be placed
-(defun possible-pos-per-piece(board piece)
-  
+;; all-spaces 
+;  checks where can a piece can be placed in the board from a list of indexes
+;  retuns a list with all possible moves based on all indexes given 
+(defun all-spaces(pieces-list piece board indexes-list)
+  (remove-nil(mapcar (lambda (index) (cond ((can-placep pieces-list board (first index) (second index) piece) index) (t nil))) indexes-list))
 )
 
-
-(defun possible-pos-piece-a(board)
-  
+;; possible moves 
+;  checks where can a piece can be placed in the board from all positions in the board
+;  returns a list with indexes for all moves possible with a piece (sorted - up/down)
+;  test => (possible-moves '(1 1 1) 'piece-a (board-a))
+;  restult => ((0 0) (0 1) (0 2) (0 3) (1 0) (1 1) (1 2) (1 3) (2 0) (2 1) (2 2) (2 3) (3 0) (3 1) (3 2) (3 3))
+(defun possible-moves(pieces-list piece board)
+  (reverse (all-spaces pieces-list piece board (check-all-board board (1- (length board)) (1- (length (car board))))))
+  #|(cond 
+    ((equal 'piece-a piece) (reverse (all-spaces pieces-list piece board (check-all-board board (1- (length board)) (1- (length (car board)))))))
+  )|#
 )
 
-(defun possible-pos-piece-b(board)
-
-)
-(defun possible-pos-piece-c1(board)
-
-)
-
-(defun possible-pos-piece-c2(board)
-
-)
-
-; ---------------------------------
+; --------------------------------- ;
 
 ;;; Operators
 
+;; init-pieces 
+;  list with the number of each piece at the start
 (defun init-pieces()
   (list 10 10 15)
 )
@@ -342,23 +348,23 @@
 ;  board = (node-state node)
 ;  returns board with the pieces placed or nil if fails 
 (defun piece-a (pieces-list row col board)
-  (insert-piece pieces-list row col board 'peca-a)
+  (insert-piece pieces-list row col board 'piece-a)
 )
 
 ;; piece-b
 ;
 (defun piece-b (pieces-list row col board)
-   (insert-piece pieces-list row col board 'peca-b)
+   (insert-piece pieces-list row col board 'piece-b)
 )
 
 ;; piece-c-1
 ;
 (defun piece-c-1 (pieces-list row col board)
-  (insert-piece pieces-list row col board 'peca-c-1)
+  (insert-piece pieces-list row col board 'piece-c-1)
 )
 
 ;; piece-c-2
 ;
 (defun piece-c-2 (pieces-list row col board)
-  (insert-piece pieces-list row col board 'peca-c-2)
+  (insert-piece pieces-list row col board 'piece-c-2)
 )
