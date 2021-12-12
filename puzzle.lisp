@@ -5,7 +5,7 @@
 
 
 
-;;; Problems
+;;; Problems + Board
 
 ;; Problem A
 ;; At least 8 elements fulfilled
@@ -107,8 +107,6 @@
     (2 2 2 2 2 2 2 2 2 2 2 2 2 2));14
 )
 
-;;; Board
-
 ;; Problem f
 ;; At least 72 elements fulfilled
 ;; Empty Board 14x14 
@@ -138,12 +136,20 @@
   (nth col (row r board))
 )
 
+---------------------------------
+
+;;; Pieces
+
+
+---------------------------------
 
 ;;; Secondary functions
 
-;; empty-elemp
+;; Cells/elements verification
+
+;  empty-elemp
 ;  returns t if a board element is empty(or the value - val) and nil if it isn't
-(defun empty-elemp(row col board &optional (val 0))
+(defun empty-elemp(row col board &optional (val 0)) 
   "row and col must be numbers between 0 and the board dimension"
   (cond 
   ((or (< row 0) (> row (1- (length board))) (< col 0) (> col (1-(length board)))) nil)
@@ -152,21 +158,24 @@
   )
 )
 
-;; check-empty-elems 
-;  checks if each element of indexes-list is empty or not in the board
-;  indexes-list - ex -  ((0 0) (0 2) (4 2))
-;  returns a list of t and nil depending on each index  
-(defun check-empty-elems(board indexes-list &optional (val 0))
+; check-empty-elems
+; checks if each element of indexes-list is empty or not in the board
+; indexes-list - ex -  ((0 0) (0 2) (4 2))
+; returns a list of t and nil depending on each index  
+(defun check-empty-elems(board indexes-list &optional (val 0)) 
   "Each element(list with row and col) in indexes-list
    must contain a valid number for the row and column < (length board)"
   (mapcar (lambda (index) (empty-elemp (first index) (second index) board val)) indexes-list)
 )
 
 
-;; replace-pos 
+;; replace-pos + replace- + replace-multi-pos
+;; replace position in the board
+
+
 ;  replaces a position in the board for val
 ;  returns a row(list) with element in column(col) position replaced by the val
-(defun replace-pos (col row &optional (val 1))
+(defun replace-pos (col row &optional (val 1)) 
     "Col (column) must be a number between 0 and the row length"
     (cond 
      ((null row) nil)
@@ -175,10 +184,9 @@
     )
 )
 
-;; replace 
 ;  replaces an element in the board  
 ;  returns the all board with element replaced by the value
-(defun replace- (row col board &optional (val 1))
+(defun replace- (row col board &optional (val 1)) 
   "Row and column must be a number between 0 and the board length"
   (cond  
    ((null board) nil)
@@ -187,32 +195,22 @@
   )
 )
 
-;; replace-multi-pos
 ;  replaces multiple positions in the board
 ;  pos-list => list with all positions to replace
 ;  returns the all board with all elements replaced 
-(defun replace-multi-pos (pos-list board &optional (val 1))
+(defun replace-multi-pos (pos-list board &optional (val 1)) 
     (cond 
       ((null pos-list) board)
       (t (replace-multi-pos (cdr pos-list) (replace- (first (car pos-list)) (second (car pos-list)) board val)))
     )
 )
 
-;; insert-piece
-;  uses the piece-taken-elems to push pieces into the board
-(defun insert-piece (row col board piece)
-  (cond 
-    ((or (> row (length board))  (< row 0) (< col 0) (> col (length board))) nil)
-    ((not (check-adjacent-elems row col board piece)) nil)
-    ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col piece))))
-    (replace-multi-pos (piece-taken-elems row col piece) board))
-    (t nil)
-   )
-)
+
+
 
 ;; piece-taken-elems 
 ;  returns a list with all elements/cells that a particular piece takes in a board
-(defun piece-taken-elems (row col piece)
+(defun piece-taken-elems (row col piece) 
   (cond 
    ((equal piece 'peca-a) (cons (list row col) nil))                                            
    ((equal piece 'peca-b)                                  
@@ -226,7 +224,11 @@
    )
 )
 
-;; check-adjacent-elems
+;;;  Board Verifications
+
+
+
+;;  check-adjacent-elems
 ;  check if adjacente elements/cells are taken (1, 2 or +)
 ;  if, in fact, they are taken then returns null
 ;  else 
@@ -249,6 +251,20 @@
    )
 )
 
+
+;; insert-piece
+;  uses the piece-taken-elems to push pieces into the board
+(defun insert-piece (row col board piece) 
+  (cond 
+    ((or (> row (length board))  (< row 0) (< col 0) (> col (length board))) nil)
+    ((not (check-adjacent-elems row col board piece)) nil)
+    ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col piece))))
+    (replace-multi-pos (piece-taken-elems row col piece) board))
+    (t nil)
+   )
+)
+
+--------------------------------------
 
 ;;; Operators
 
@@ -284,11 +300,5 @@
 
 
 
-
-
-
-
-
-;! em falta
 ; Quantidade de pecas que ainda se pode meter
 ; 

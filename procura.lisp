@@ -10,8 +10,8 @@
 ;; make-node
 ; constructs a node with the state (board), depth and the parent node
 ; returns a list with all data
-(defun make-node(state &optional (depth 0) (parent nil))
-  (list state depth parent)
+(defun make-node(state &optional (g 0) (parent nil) (h 0) (pieces '(10 10 15)))
+  (list state g parent h pieces)
 )
 
 ;; node-state
@@ -30,6 +30,15 @@
 ;  returns a parent node of other node 
 (defun node-parent(node)
   (third node)
+)
+
+;
+(defun node-h(node)
+  (fourth node) 
+)
+
+(defun node-pieces-left(node)
+  (last node)
 )
 
 ;; get-child
