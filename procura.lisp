@@ -76,31 +76,32 @@
 ;; row-count-cells-pieces
 ;  Count the pieces cells in the list
 ;  returns number of pieces cells in the list
-(defun row-count-cells-pieces(board)
+(defun count-row-elems (row &optional (val 1))
   (cond
-    ((null board) 0)
-    ((= (first board) 1) (1+ (row-count-cells-pieces (cdr board))))
-    (t (row-count-cells-pieces (cdr board)))
+    ((null row) nil)
+    ((= (first row) val) (1+ (count-row-elems (cdr row))))
+    (t (count-row-elems (cdr row)))
     )
 )
 
 ;; cells-pieces-by-row
 ;  Receive a list with sublists and count the pieces cells by list
 ;  return a list with number of pieces cells by list
-(defun cells-pieces-by-row (board)
+(defun count-board-elems (board &optional (val 1))
   (cond 
     ((null board) nil)
-    (t (cons (row-count-cells-pieces (car board)) (cells-pieces-by-row (cdr board))))
+    (t (cons (count-row-elems (car board val)) (count-board-elems (cdr board) val)))
   )
 )
 
 ;; solutionp 
 ;  solution state = at least x elems inserted
 ;  returns a solution node
-(defun taken-elems (board)    
+(defun count-all-elems (board &optional (val 1))    
     (cond  
-      ((null board) 0 )
-      (t (+ (first (cells-pieces-by-row (board-a))) (taken-elems (rest board))))
+      ((null board) nil)
+      ;(t (+ (first (cells-pieces-by-row (board-a))) (taken-elems (rest board))))
+      (t(apply '+ (count-board-elems baord val)))
     )   
 )
 
