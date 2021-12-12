@@ -248,6 +248,43 @@
    )
 )
 
+;; check-first-cell
+;  check if first cell is empty
+;  returns null if is emmpty, otherwise returns true
+(defun check-first-cell (row col board)
+  (cond
+   ((= (element 0 0 board) row col 0) t)
+   ((= (element 0 0 board) 1) t)
+   (t nil)
+   )
+)
+
+;;  check-corners-elems
+;  check if there are any pieces in one of the corners
+;  if, in fact, they are taken then returns true
+;  else returns null
+(defun check-corners-elems (row col board piece)
+  (cond
+   ((eval (cons 'or (check-empty-elems board (piece-corners-elems row col piece) 1))) t)
+   (t nil)
+   )
+)
+
+;; piece-corners-elems
+;  returns a list with all corners elements/cells that a particular piece takes in the board
+(defun piece-corners-elems (row col piece)
+  (cond
+   ((equal piece 'peca-a)
+    (list (list (1- row) (1- col)) (list (1+ row) (1- col)) (list (1- row) (1+ col)) (list (1+ row) (1+ col))))
+   ((equal piece 'peca-b)
+    (list (list (1- row) (1- col)) (list (+ row 2) (1- col)) (list (1- row) (+ col 2)) (list (+ row 2) (+ col 2))))
+   ((equal piece 'peca-c-1)
+    (list (list (- row 2) col) (list (1- row) (1- col)) (list (1+ row) (1- col)) (list (- row 2) (+ col 3)) (list row (+ col 3)) (list (1+  row) (+ col 2))))
+   ((equal piece 'peca-c-2)
+    (list (list (1- row) (1- col)) (list (1- row) (1+ col)) (list row (+ col 2)) (list (+ row 2) (1- col)) (list (+ row 3) col) (list (+ row 3) (+ col 2))))
+   )
+)
+
 ;; can-place-piecep
 ;  test => (can-placep (list 0 0 0) (empty-board) 0 0  'piece-a)
 ;  result => nil
@@ -255,6 +292,8 @@
   (cond 
     ((= 0 (pieces-left-numb pieces-list piece)) nil)
     ((or (> row (length board)) (< row 0) (< col 0) (> col (length board))) nil)
+    ;((not (check-first-cell row col board)) nil)
+    ((and (not (check-corners-elems row col board piece)) (not (check-first-cell row col board))) nil)
     ((not (check-adjacent-elems row col board piece)) nil)
     ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col piece))))t)
     (t nil)
