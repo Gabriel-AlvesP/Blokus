@@ -14,34 +14,49 @@
   (list state depth parent)
 )
 
+;; node-state
+;  returns a node's state
 (defun node-state(node)
   (first node)
 )
 
+;; node-depth
+;  returns a node's depth
 (defun node-depth(node)
   (second node)
 )
 
-
+;; node-parent 
+;  returns a parent node of other node 
 (defun node-parent(node)
   (third node)
 )
 
+;; get-child
+;  applies a operation to a node 
+;  return a node
 (defun get-child(node operation &aux (state (node-state node)))
+    "Operation must be a function"
 	(cond 
-		((null (funcall operation state)) nil)
-		(t (list (funcall operation state) (1+ (depth node)) node)) 
+         ((null (funcall operation state)) nil)
+         (t (list (funcall operation state) (1+ (depth node)) node)) 
 	)
 )
 
+;; get-children
+;  uses the function get-child and executes multiple operations to a node 
+;  return a list of nodes
 (defun get-children(node operations-list alg &optional d)
 	(cond
-		((null operations-list) nil)
-		((and (equal alg 'dfs) (< d (1+ (depth node)))) nil)
-		(t (cons (get-child node (car operations-list)) (get-children node (cdr operations-list) alg d)))
+         ((null operations-list) nil)
+         ((and (equal alg 'dfs) (< d (1+ (depth node)))) nil)
+         (t (cons (get-child node (car operations-list)) (get-children node (cdr operations-list) alg d)))
 	)
 )
 
+;; exist-nodep
+;  checks if the node-list contains a node with the same state as the parameter node
+;  returns t if exists and nil if it doesn't 
 (defun exist-nodep(node node-list)
   (cond 
    ((null node-list)nil)
@@ -49,34 +64,75 @@
    )
 )
 
+;; row-count-cells-pieces
+;  Count the pieces cells in the list
+;  returns number of pieces cells in the list
+(defun row-count-cells-pieces(board)
+  (cond
+    ((null board) 0)
+    ((= (first board) 1) (1+ (row-count-cells-pieces (cdr board))))
+    (t (row-count-cells-pieces (cdr board)))
+    )
+)
+
+;; cells-pieces-by-row
+;  Receive a list with sublists and count the pieces cells by list
+;  return a list with number of pieces cells by list
+(defun cells-pieces-by-row (board)
+  (cond 
+    ((null board) nil)
+    (t (cons (row-count-cells-pieces (car board)) (cells-pieces-by-row (cdr board))))
+  )
+)
+
+;; solutionp 
+;  solution state = at least x elems inserted
+;  returns a solution node
+(defun taken-elems (board)    
+    (cond  
+      ((null board) 0 )
+      (t (+ (first (cells-pieces-by-row (board-a))) (taken-elems (rest board))))
+    )   
+)
+
+(defun get-solution (node-list solution)
+  (cond 
+    ((null node-list) nil)
+    ((>= (taken-elems (node-state (car node-list))) solution) (car node-list))
+    (t (get-solution (cdr node-list) solution))
+  )
+)
+
 ;;;  Algoritmo de procura de Largura Primeiro (BFS)
 
-;; 
-;  returns a list with all non expanded children
-(defun remove-duplicated(children open closed) 
+;; remove-duplicated
+;  checks if a list(children) and two other lists(open and close) contain nodes with the same state and remove them 
+;  returns a list with non duplicated nodes
+(defun remove-duplicated(children open  &optional closed) 
         (cond
             ((or(null children) (null open) (null closed)) nil)
-            ((eval (cons 'or (mapcar 'exist-nodep  (car children) open))) (remove-duplicated (cdr children) open closed))
-            ((eval (cons 'or (mapcar 'exist-nodep  (car children) closed))) (remove-duplicated (cdr children) open closed))
+            ((exist-nodep (car children) open) (remove-duplicated (cdr children) open closed))
+            ((exist-nodep (car children) closed) (remove-duplicated (cdr children) open closed))
             (t (cons (car children) (remove-duplicated (cdr children) open closed)))
         )
 )
 
 ;; bfs
 ;  returns a found node solution
-(defun bfs(solution-fun get-children operations &optional (closed nil) (opened nil)  node-init)
+; (bfs get-solution get-children (operations) (make-node (empty-board))) 
+(defun bfs(solution get-children operations open &optional (closed nil))
     (cond 
-        ((not (null node-init))  (bfs solution-fun get-children operations closed (cons node-init opened)))
-        ((null opened) nil)
-        (t (let ((current-node (car opened)) (children (remove-duplicated (get-children node-init operations 'bfs) opened closed))) 
+        ((null open) nil) 
+        (t (let* ((current-node (car open)) (children (remove-duplicated (funcall 'get-children current-node operations 'bfs) open closed))) 
                 (cond 
-                    ((mapcar 'solution-fun (append (cdr opened) children)) current-node)
-                    (t (bfs solution-fun get-children operations (cons (car opened) closed) (append (cdr opened) children)))
+                    ((null (get-solution children solution)) (bfs solution get-children operations (append (cdr open) children) (cons current-node closed) ))
+                    (t (get-solution children solution))
                 )
             )
         )  
     )
 )
+
 
 ;;;  Algoritmo de Procura do Profundidade Primeiro (DFS)
 
