@@ -254,7 +254,6 @@
 (defun check-first-cell (row col board)
   (cond
    ((= (element 0 0 board) row col 0) t)
-   ((= (element 0 0 board) 1) t)
    (t nil)
    )
 )
@@ -270,17 +269,26 @@
    )
 )
 
+(defun force-move (row col board piece) 
+  (cond 
+    ((and (= (element 0 0 board) 0) (or (/= row 0) (/= col 0))) nil)
+    ((= (element 0 0 board) row col 0) t)
+    ((eval (cons 'or (check-empty-elems board (piece-corners-elems row col piece) 1))) t)
+    (t nil)
+  )
+)
+
 ;; piece-corners-elems
 ;  returns a list with all corners elements/cells that a particular piece takes in the board
 (defun piece-corners-elems (row col piece)
   (cond
-   ((equal piece 'peca-a)
+   ((equal piece 'piece-a)
     (list (list (1- row) (1- col)) (list (1+ row) (1- col)) (list (1- row) (1+ col)) (list (1+ row) (1+ col))))
-   ((equal piece 'peca-b)
+   ((equal piece 'piece-b)
     (list (list (1- row) (1- col)) (list (+ row 2) (1- col)) (list (1- row) (+ col 2)) (list (+ row 2) (+ col 2))))
-   ((equal piece 'peca-c-1)
+   ((equal piece 'piece-c-1)
     (list (list (- row 2) col) (list (1- row) (1- col)) (list (1+ row) (1- col)) (list (- row 2) (+ col 3)) (list row (+ col 3)) (list (1+  row) (+ col 2))))
-   ((equal piece 'peca-c-2)
+   ((equal piece 'piece-c-2)
     (list (list (1- row) (1- col)) (list (1- row) (1+ col)) (list row (+ col 2)) (list (+ row 2) (1- col)) (list (+ row 3) col) (list (+ row 3) (+ col 2))))
    )
 )
@@ -292,8 +300,8 @@
   (cond 
     ((= 0 (pieces-left-numb pieces-list piece)) nil)
     ((or (> row (length board)) (< row 0) (< col 0) (> col (length board))) nil)
-    ;((not (check-first-cell row col board)) nil)
-    ((and (not (check-corners-elems row col board piece)) (not (check-first-cell row col board))) nil)
+    ;((and (not (check-corners-elems row col board piece)) (not (check-first-cell row col board))) nil)
+    ((not (force-move row col board piece)) nil)
     ((not (check-adjacent-elems row col board piece)) nil)
     ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col piece))))t)
     (t nil)
@@ -362,9 +370,6 @@
 ;  restult => ((0 0) (0 1) (0 2) (0 3) (1 0) (1 1) (1 2) (1 3) (2 0) (2 1) (2 2) (2 3) (3 0) (3 1) (3 2) (3 3))
 (defun possible-moves(pieces-list piece board)
   (reverse (all-spaces pieces-list piece board (check-all-board board (1- (length board)) (1- (length (car board))))))
-  #|(cond 
-    ((equal 'piece-a piece) (reverse (all-spaces pieces-list piece board (check-all-board board (1- (length board)) (1- (length (car board)))))))
-  )|#
 )
 
 ; --------------------------------- ;
