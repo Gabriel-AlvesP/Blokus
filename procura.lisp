@@ -8,58 +8,78 @@
 ;;; Abstract Data Types
 
 ;; make-node
-; constructs a node with the state (board), depth and the parent node
-; returns a list with all data
-(defun make-node(state &optional (g 0) (parent nil) (h 0) (pieces '(10 10 15)))
-  (list state g parent h pieces)
+;  constructs a node with the state (board), depth and the parent node
+;  returns a list with all data
+;  test => (make-node (empty-board))
+(defun make-node(state &optional (parent nil) (g 0) (h 0) (pieces '(10 10 15)))
+  (list state parent g h pieces)
 )
 
 ;; node-state
 ;  returns a node's state
+;  test => (node-state (make-node (empty-board)))
 (defun node-state(node)
   (first node)
 )
 
-;; node-depth
-;  returns a node's depth
-(defun node-depth(node)
+;; node-parent 
+;  returns a parent node of other node 
+;  test => (node-parent (make-node (empty-board) (board-d)))
+(defun node-parent(node)
   (second node)
 )
 
-;; node-parent 
-;  returns a parent node of other node 
-(defun node-parent(node)
+;; node-depth
+;  returns a node's depth
+;  test => (node-depth (make-node (empty-board) (board-d) 1))
+(defun node-depth(node)
   (third node)
 )
 
-;
+;;  node-h 
+;  return heuristic value
+;  test => (node-h (make-node (empty-board) (board-d) 1 2))
 (defun node-h(node)
   (fourth node) 
 )
 
+;; node-pieces-left
+;  return list with the number of pieces left by type 
+;  test => (node-pieces-left (make-node (empty-board) (board-d) 1 2 '(1 2 3)))  
 (defun node-pieces-left(node)
-  (last node)
+  (nth (1- (length node)) node)
 )
 
 ;; get-child
 ;  applies a operation to a node 
 ;  return a node
-(defun get-child(node operation &aux (state (node-state node)))
+;  test => (get-child (make-node (empty-board)) (car (possible-moves (init-pieces) 'piece-a (empty-board))) 'piece-a)
+(defun get-child(node possible-move operation &aux (pieces-left (node-pieces-left node)) (state (node-state node)))
     "Operation must be a function"
-	(cond 
-         ((null (funcall operation state)) nil)
-         (t (list (funcall operation state) (1+ (depth node)) node)) 
-	)
+    (cond 
+      ((null (funcall operation pieces-left possible-move state)) nil)
+      (t (make-node (funcall operation pieces-left possible-move state) node (1+ (node-depth node)) (node-h node) (remove-used-piece (node-pieces-left node) operation))) 
+      )
+)
+
+;; get-children 
+;  
+;  return a list of nodes
+(defun get-children(node possible-moves operation)
+  (cond 
+    ((null possible-moves) nil)
+    (t (cons (get-child node (car possible-moves) operation) (get-children node (cdr possible-moves) operation)))
+  )
 )
 
 ;; get-children
 ;  uses the function get-child and executes multiple operations to a node 
 ;  return a list of nodes
-(defun get-children(node operations-list alg &optional d)
+(defun expand-node(node possible-moves operations alg &optional g)
 	(cond
-         ((null operations-list) nil)
-         ((and (equal alg 'dfs) (< d (1+ (depth node)))) nil)
-         (t (cons (get-child node (car operations-list)) (get-children node (cdr operations-list) alg d)))
+    ((null operations) nil)
+    ((and (equal alg 'dfs) (< g (1+ (depth node)))) nil)
+    (t (cons (remove-nil(get-children node possible-moves (car operations))) (expand-node node (cdr operations) alg g)))
 	)
 )
 
@@ -87,31 +107,35 @@
 ;; cells-pieces-by-row
 ;  Receive a list with sublists and count the pieces cells by list
 ;  return a list with number of pieces cells by list
+; 
 (defun count-board-elems (board &optional (val 1))
   (cond 
     ((null board) nil)
-    (t (cons (count-row-elems (car board val)) (count-board-elems (cdr board) val)))
+    (t (cons (count-row-elems (car board) val) (count-board-elems (cdr board) val)))
   )
 )
 
 ;; solutionp 
 ;  solution state = at least x elems inserted
-;  returns a solution node
+;  returns a solution 
 (defun count-all-elems (board &optional (val 1))    
     (cond  
       ((null board) nil)
       ;(t (+ (first (cells-pieces-by-row (board-a))) (taken-elems (rest board))))
-      (t(apply '+ (count-board-elems baord val)))
+      (t (apply '+ (count-board-elems board val)))
     )   
 )
+
 
 (defun get-solution (node-list solution)
   (cond 
     ((null node-list) nil)
-    ((>= (taken-elems (node-state (car node-list))) solution) (car node-list))
+    ((>= (count-all-elems (node-state (car node-list))) solution) (car node-list))
     (t (get-solution (cdr node-list) solution))
   )
 )
+
+
 
 ;;;  Algoritmo de procura de Largura Primeiro (BFS)
 

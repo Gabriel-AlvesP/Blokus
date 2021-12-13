@@ -391,24 +391,24 @@
 ;; piece-a
 ;  board = (node-state node)
 ;  returns board with the pieces placed or nil if fails 
-(defun piece-a (pieces-list row col board)
-  (insert-piece pieces-list row col board 'piece-a)
+(defun piece-a (pieces-list index board)
+  (insert-piece pieces-list (first index) (second index) board 'piece-a)
 )
 
 ;; piece-b
 ;
-(defun piece-b (pieces-list row col board)
-   (insert-piece pieces-list row col board 'piece-b)
+(defun piece-b (pieces-list index board)
+   (insert-piece pieces-list (first index) (second index) board 'piece-b)
 )
 
 ;; piece-c-1
 ;
-(defun piece-c-1 (pieces-list row col board)
-  (insert-piece pieces-list row col board 'piece-c-1)
+(defun piece-c-1 (pieces-list index board)
+  (insert-piece pieces-list (first index) (second index) board 'piece-c-1)
 )
 
 ;; piece-c-2
 ;
-(defun piece-c-2 (pieces-list row col board)
-  (insert-piece pieces-list row col board 'piece-c-2)
+(defun piece-c-2 (pieces-list index board)
+  (insert-piece pieces-list (first index) (second index) board 'piece-c-2)
 )
