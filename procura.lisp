@@ -64,7 +64,8 @@
 
 ;; get-children 
 ;  
-;  return a list of nodes
+;  return a list of nodes 
+; test => (get-children (make-node (board-d)) (possible-moves (init-pieces) 'piece-a (board-d)) 'piece-a)
 (defun get-children(node possible-moves operation)
   (cond 
     ((null possible-moves) nil)
@@ -72,15 +73,27 @@
   )
 )
 
-;; get-children
+;; expan-node
 ;  uses the function get-child and executes multiple operations to a node 
 ;  return a list of nodes
+; test => (expand-node (make-node (empty-board)) 'possible-moves (operations) 'bfs) 
+; result => cada no filho esta dentro de duas listas em vez de uma
 (defun expand-node(node possible-moves operations alg &optional g)
-	(cond
+  "possible moves must be a function that returns a list with indexes and the operations "
+  (cond
     ((null operations) nil)
     ((and (equal alg 'dfs) (< g (1+ (depth node)))) nil)
-    (t (cons (remove-nil(get-children node possible-moves (car operations))) (expand-node node (cdr operations) alg g)))
-	)
+    (t (remove-nil (cons
+              (get-children 
+                node 
+                (funcall possible-moves (node-pieces-left node) (car operations) (node-state node)) 
+                (car operations)
+               )
+               
+        (expand-node node possible-moves (cdr operations) alg g)
+       ))
+    )
+  )
 )
 
 ;; exist-nodep
