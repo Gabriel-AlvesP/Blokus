@@ -73,22 +73,23 @@
   )
 )
 
+
 ;; expan-node
 ;  uses the function get-child and executes multiple operations to a node 
 ;  return a list of nodes
-; test => (expand-node (make-node (empty-board)) 'possible-moves (operations) 'bfs) 
-; result => cada no filho esta dentro de duas listas em vez de uma
+;  test => (expand-node (make-node (empty-board)) 'possible-moves (operations) 'bfs) 
+;  result => too long 
 (defun expand-node(node possible-moves operations alg &optional g)
   "possible moves must be a function that returns a list with indexes and the operations "
   (cond
     ((null operations) nil)
     ((and (equal alg 'dfs) (< g (1+ (depth node)))) nil)
     (t (remove-nil (cons
-              (get-children 
+              (car(get-children 
                 node 
                 (funcall possible-moves (node-pieces-left node) (car operations) (node-state node)) 
                 (car operations)
-               )
+               ))
                
         (expand-node node possible-moves (cdr operations) alg g)
        ))
@@ -157,7 +158,7 @@
 ;  returns a list with non duplicated nodes
 (defun remove-duplicated(children open  &optional closed) 
         (cond
-            ((or(null children) (null open) (null closed)) nil)
+            ((or(null children) (null open)) nil)
             ((exist-nodep (car children) open) (remove-duplicated (cdr children) open closed))
             ((exist-nodep (car children) closed) (remove-duplicated (cdr children) open closed))
             (t (cons (car children) (remove-duplicated (cdr children) open closed)))
