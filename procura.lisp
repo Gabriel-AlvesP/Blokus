@@ -58,10 +58,12 @@
 ;; test => (get-child (make-node (empty-board)) (car (possible-moves (init-pieces) 'piece-a (empty-board))) 'piece-a)
 (defun get-child(node possible-move operation &aux (pieces-left (node-pieces-left node)) (state (node-state node)))
     "Operation must be a function"
-    (cond 
-      ((null (funcall operation pieces-left possible-move state)) nil)
-      (t (make-node (funcall operation pieces-left possible-move state) node (1+ (node-depth node)) (node-h node) (remove-used-piece (node-pieces-left node) operation))) 
+    (let ((move (funcall operation pieces-left possible-move state)))
+      (cond 
+        ((null move) nil)
+        (t (make-node move node (1+ (node-depth node)) (node-h node) (remove-used-piece (node-pieces-left node) operation))) 
       )
+    )
 )
 
 ;; get-children 
@@ -82,18 +84,12 @@
 ;; In sum, expand a node 
 ;; return a list of nodes
 ;; test => (expand-node (make-node (empty-board)) 'possible-moves (operations) 'bfs) 
-(defun expand-node(node possible-moves operations alg &optional g)
+(defun expand-node(node possible-moves operations alg &optional (g 0))
   "possible moves must be a function that returns a list with indexes and the operations "
   (cond
     ((null operations) nil)
-    ((and (equal alg 'dfs) (< g (1+ (depth node)))) nil)
-    (t (remove-nil (cons
-              (car (get-children 
-                node 
-                (funcall possible-moves (node-pieces-left node) (car operations) (node-state node)) 
-                (car operations)
-               ))
-               
+    ((and (equal alg 'dfs) (< g (1+ (node-depth node)))) nil)
+    (t (remove-nil (cons (car (get-children node (funcall possible-moves (node-pieces-left node) (car operations) (node-state node)) (car operations)))         
         (expand-node node possible-moves (cdr operations) alg g)
        ))
     )
@@ -157,7 +153,8 @@
   "solution must be and number"
   (cond 
     ((null node) nil)
-    ((>= (count-all-elems (node-state node) val) solution) node)
+    ((>= (count-all-elems (node-state node) val) solution) t)
+    (t nil)
   )
 )
 
@@ -168,7 +165,9 @@
 (defun get-solution (node-list solution &optional (val 1))
   (cond 
     ((null node-list) nil)
-    (t (remove-nil(cons (solutionp (car node-list) solution val) (get-solution (cdr node-list) solution val))))
+    ((solutionp (car node-list) solution val) (car node-list))
+    ;(t (remove-nil(cons (solutionp (car node-list) solution val) (get-solution (cdr node-list) solution val))))    
+    (t (get-solution (cdr node-list) solution val))
   )  
 )
 
@@ -212,11 +211,11 @@
               (closed1 (cons current-node closed))
               (filtered-children (remove-duplicated (expand-node current-node 'possible-moves operations 'bfs) open closed1))
               (open1 (append (cdr open) filtered-children))
-              (solutions (get-solution filtered-children solution))
+              (first-solution (get-solution filtered-children solution))
              )
          (cond 
-          ((null solutions) (bfs solution operations open1 closed1))
-          (t (car solutions))
+          ((null first-solution) (bfs solution operations open1 closed1))
+          (t first-solution)
          )
        )
     )
@@ -224,24 +223,21 @@
 )
 
 
-
-
 ;;;  Algoritmo de Procura do Profundidade Primeiro (DFS)
 
-
-(defun dfs (solution operations open g  &optional (closed nil))
+(defun dfs (solution operations open max-g  &optional (closed nil))
   (cond 
     ((null open) nil)
     (t (let* ( 
               (current-node (car open))
               (closed1 (cons current-node closed))
-              (filtered-children (remove-duplicated (expand-node current-node 'possible-moves operations 'dfs g)  open closed1))
-              (open1 (append (cdr open) filtered-children))
-              (solutions (get-solution filtered-children solution))
+              (filtered-children (remove-duplicated (expand-node current-node 'possible-moves operations 'dfs max-g) open closed1))
+              (open1 (append filtered-children (cdr open)))
+              (first-solution (get-solution filtered-children solution))
             )
         (cond 
-          ((null solutions) (bfs solution operations open1 closed1))
-          (t (car solutions))
+          ((null first-solution) (bfs solution operations open1 closed1))
+          (t  first-solution)
         )
       )
     )
@@ -249,6 +245,50 @@
 )
 
 ;;;  Algoritmo de Procura do Melhor Primeiro (A*)
+
+;; h1
+;; h(x) = o(x) - c(x)
+;; o - objetivo para o tabuleiro 
+;; c - numero de quadrados preenchidos no tabuleiro
+(defun h1 (solution node)
+  (- solution (count-all-elems (node-state node)))
+)
+
+
+;; h2
+;; 
+;; 
+;; 
+(defun h2 ())
+
+;; f 
+;; 
+;;
+(defun f (node)
+  (+ (node-depth node) (node-h node))
+)
+
+(defun sort (node-list)
+  (let (())
+
+  )
+)
+
+(defun a* (solution operations open &optional (closed nil))
+  (cond
+    ((null ))
+    )
+
+
+)
+
+
+;;; Performance Stats
+
+
+(defun generated-nodes())
+
+(defun penetrance())
 
 
 ;;;  Os algoritmos SMA*, IDA* e/ou RBFS (bonus)

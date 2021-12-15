@@ -258,23 +258,12 @@
    )
 )
 
-;;  check-corners-elems
-;  check if there are any pieces in one of the corners
-;  if, in fact, they are taken then returns true
-;  else returns null
-(defun check-corners-elems (row col board piece)
-  (cond
-   ((eval (cons 'or (check-empty-elems board (piece-corners-elems row col piece) 1))) t)
-   (t nil)
-   )
-)
-
 ;; force-move
 ;; This functions filters possible plays
 ;; if the first board's corner is empty, only allows pieces at the first corner of the board 
 ;; If the first board's corner is not empty, only allows moves that place pieces in touch with others (corner touch only)  
 ;; In sum, filters possible plays
-;; returns t if the move is allow in that board and nil if it is not 
+;; returns t if the move is allow in that board and nil if it is not
 (defun force-move (row col board piece) 
   (cond 
     ((and (= (element 0 0 board) 0) (or (/= row 0) (/= col 0))) nil)
@@ -323,6 +312,7 @@
   )
 )
 
+
 ; ---------------------------------
 
 ;;; Pieces
@@ -334,7 +324,7 @@
   (cond 
     ((null (can-placep pieces-list board row col piece)) nil)
     (t (replace-multi-pos (piece-taken-elems row col piece) board)))
-   )
+)
 
 ;; pieces-left-numb
 ;  pieces-list= list with all pieces left to play
@@ -362,7 +352,7 @@
 )
 
 ;; all-spaces 
-;  checks where can a piece can be placed in the board from a list of indexes
+;  checks where can a piece be placed in the board from a list of indexes
 ;  retuns a list with all possible moves based on all indexes given 
 (defun all-spaces(pieces-list piece board indexes-list)
   (remove-nil(mapcar (lambda (index) (cond ((can-placep pieces-list board (first index) (second index) piece) index) (t nil))) indexes-list))
