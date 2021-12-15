@@ -269,6 +269,12 @@
    )
 )
 
+;; force-move
+;; This functions filters possible plays
+;; if the first board's corner is empty, only allows pieces at the first corner of the board 
+;; If the first board's corner is not empty, only allows moves that place pieces in touch with others (corner touch only)  
+;; In sum, filters possible plays
+;; returns t if the move is allow in that board and nil if it is not 
 (defun force-move (row col board piece) 
   (cond 
     ((and (= (element 0 0 board) 0) (or (/= row 0) (/= col 0))) nil)
@@ -300,7 +306,6 @@
   (cond 
     ((= 0 (pieces-left-numb pieces-list piece)) nil)
     ((or (> row (length board)) (< row 0) (< col 0) (> col (length board))) nil)
-    ;((and (not (check-corners-elems row col board piece)) (not (check-first-cell row col board))) nil)
     ((not (force-move row col board piece)) nil)
     ((not (check-adjacent-elems row col board piece)) nil)
     ((eval (cons 'and (check-empty-elems board (piece-taken-elems row col piece))))t)
