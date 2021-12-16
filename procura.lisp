@@ -160,9 +160,9 @@
 
 
 ;; get-solution
-;; 
-;; returns a list with the possible solutions to a problem 
+;; returns a possible solution to a problem (node) 
 (defun get-solution (node-list solution &optional (val 1))
+  "solution must be a number"
   (cond 
     ((null node-list) nil)
     ((solutionp (car node-list) solution val) (car node-list))
@@ -200,10 +200,13 @@
   )
 )
 
-;;
-;;
+
+;; dfs
 ;; (bfs 8 (operations) (list (make-node (board-a))))
 (defun bfs (solution operations open  &optional (closed nil))
+  "solution must be a number,
+   operations must be a list(must use operations function)"
+
   (cond 
     ((null open) nil)
     (t (let* ( 
@@ -239,16 +242,15 @@
     )
 )
 
-;;    ((< (node-depth node) (node-depth duplicated-node)) (remove duplicated-node closed))
-
 ;; duplicated-dfs
-;; Checks if a node is duplicated in two list of nodes(open and closed)
+;; Checks if a node is duplicated in two list(open and closed)
 ;; returns 
-;;  nil if open is open 
-;;  0 if node is not duplicated and should be added to open
-;;  1 if it should abandon the generated node 
-;;  2 if it sho;; test => (duplicated-dfs (make-node (board-b)) (list (make-node (empty-board))) (list (make-node (board-b) nil 1 1 (init-pieces))))uld remove the closed node that is duplicated and add to open
-;;  result => (car closed)
+;; nil if open is open 
+;; 0 if node is not duplicated and should be added to open
+;; 1 if it should abandon the generated node 
+;; 2 if it should remove the closed node that is duplicated and add to open
+;; test => (duplicated-dfs (make-node (board-b)) (list (make-node (empty-board))) (list (make-node (board-b) nil 1 1 (init-pieces))))
+;; result => (car closed)
 (defun duplicated-dfs (node open closed)
     (let ((duplicated-node (get-duplicated node closed)))
     (cond 
@@ -260,7 +262,6 @@
   )
 )
  
-
 
 ;; remove-duplicated-dfs
 ;; checks if a list(node) exists in the two other lists(open and close)
@@ -278,11 +279,9 @@
   )
 )
 
-
-
 ;; closed-duplicated
-;; 
-;;
+;; removes the duplicated nodes that cost more than the new generated nodes
+;; returns a list with all closed nodes 
 (defun closed-duplicated (node-list open closed)
   (let ((duplicated-val (duplicated-dfs (car node-list) open closed)))
     (cond 
@@ -294,6 +293,8 @@
 )
 
 
+
+;; dfs
 (defun dfs (solution operations open max-g  &optional (closed nil))
   (cond 
     ((null open) nil)
@@ -325,9 +326,7 @@
 
 
 ;; h2
-;; 
-;; 
-;; 
+;; ASAP 
 (defun h2 ())
 
 ;; f 
@@ -337,10 +336,7 @@
   (+ (node-depth node) (node-h node))
 )
 
-#|(defun sort (node-list)
-  (let (())
-
-  )
+(defun sort (node-list)
 )
 
 (defun a* (solution operations open &optional (closed nil))
@@ -351,15 +347,29 @@
   )
 )
 
-
 ;;; Performance Stats
 
 
-(defun generated-nodes())
+(defun solution-node(sol)
+  (first sol)
+)
 
-(defun penetrance())
+(defun solution-path(solution-node)
+  (cond 
+    ((null node-parent) nil)
+    (t (cons solution-path (solution-path (node-parent solution-node))))
+  )
+)
 
-|#
+(defun generated-nodes(sol)
+  (second sol)
+)
+
+
+(defun penetrance(x y)
+
+)
+
 ;;;  Os algoritmos SMA*, IDA* e/ou RBFS (bonus)
 
 
