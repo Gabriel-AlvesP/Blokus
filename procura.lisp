@@ -51,17 +51,16 @@
 
 ;;; Aux Functions
 
-
 ;; get-child
 ;; Uses one piece and applies an operation with a possible move to create a child from a node 
 ;; returns a node
 ;; test => (get-child (make-node (empty-board)) (car (possible-moves (init-pieces) 'piece-a (empty-board))) 'piece-a)
-(defun get-child(node possible-move operation &aux (pieces-left (node-pieces-left node)) (state (node-state node)))
+(defun get-child(node possible-move operation &aux (pieces-left (node-pieces-left node)) (state (node-state node)) &optional (h 'h0) (solution 0))
     "Operation must be a function"
     (let ((move (funcall operation pieces-left possible-move state)))
       (cond 
         ((null move) nil)
-        (t (make-node move node (1+ (node-depth node)) (node-h node) (remove-used-piece (node-pieces-left node) operation))) 
+        (t (make-node move node (1+ (node-depth node)) (funcall h solution move) (remove-used-piece (node-pieces-left node) operation))) 
       )
     )
 )
@@ -71,10 +70,10 @@
 ;; Generates all children from a operation(piece)
 ;; returns a list of nodes 
 ;; test => (get-children (make-node (board-d)) (possible-moves (init-pieces) 'piece-a (board-d)) 'piece-a)
-(defun get-children(node possible-moves operation)
+(defun get-children(node possible-moves operation &optional (h 'h0) (solution 0))
   (cond 
     ((null possible-moves) nil)
-    (t (cons (get-child node (car possible-moves) operation) (get-children node (cdr possible-moves) operation)))
+    (t (cons (get-child node (car possible-moves) operation h solution) (get-children node (cdr possible-moves) operation h solution)))
   )
 )
 
@@ -84,13 +83,13 @@
 ;; In sum, expand a node 
 ;; return a list of nodes
 ;; test => (expand-node (make-node (empty-board)) 'possible-moves (operations) 'bfs) 
-(defun expand-node(node possible-moves operations alg &optional (g 0))
+(defun expand-node(node possible-moves operations alg &optional (g 0) (h 'h0) (solution 0))
   "possible moves must be a function that returns a list with indexes and the operations "
   (cond
     ((null operations) nil)
     ((and (equal alg 'dfs) (< g (1+ (node-depth node)))) nil)
-    (t (remove-nil (cons (car (get-children node (funcall possible-moves (node-pieces-left node) (car operations) (node-state node)) (car operations)))         
-        (expand-node node possible-moves (cdr operations) alg g)
+    (t (remove-nil (cons (car (get-children node (funcall possible-moves (node-pieces-left node) (car operations) (node-state node)) (car operations) h solution))         
+        (expand-node node possible-moves (cdr operations) alg g h solution)
        ))
     )
   )
@@ -316,12 +315,14 @@
 
 ;;;  Algoritmo de Procura do Melhor Primeiro (A*)
 
+(defun h0 (solution move)0)
+
 ;; h1
 ;; h(x) = o(x) - c(x)
 ;; o - board's objective (solution) 
 ;; c - how many elements/cells are filled (count-all-elems)
-(defun h1 (solution node)
-  (- solution (count-all-elems (node-state node)))
+(defun h1 (solution state)
+  (- solution (count-all-elems state))
 )
 
 
@@ -343,7 +344,7 @@
 ;; Returns t if it is duplicated and nil if it is not
 ;; test => (duplicatedp-a* (make-node (board-b)) (list (make-node (board-b)) (make-node (board-a)) (make-node (empty-board)))  (list (make-node (board-c))))
 ;; result => nil
-(defun duplicatedp-a*(node open closed)
+(defun duplicatedp-a*(node &optional open closed)
   (cond 
     ((exist-nodep node closed) t)
     (t nil)
@@ -381,14 +382,16 @@
   ) 
 )
 
+
+;; check-duplicated
+;; 
 (defun check-duplicated (expanded-nodes open)
   (let (
         (current (car expanded-nodes))
         (duplicated-open (get-duplicated current open))
        )
-    (cond 
-        ; remove duplicated-open from open
-      (t )                                              ; continue
+    (cond  
+      (t )   ; remove duplicated-open from open                        
     )
   )
 )
@@ -401,8 +404,13 @@
   (cond
     ((null open) nil)
     (t (let* (
-              (current-node (car open))
-              (filtered-children (remove-duplicated (expand-node current-node 'possible-moves operations 'bfs) 'duplicatedp-a* open closed1))
+               (current-node (car open))
+               (closed1 (cons current closed))
+               (filtered-children (to-insert-in-open 
+                 (remove-duplicated (expand-node current-node 'possible-moves operations 'a) 'duplicatedp-a* open closed1)
+                 (cdr open))
+               )
+               (open1 (append (check-duplicated filtered-children (cdr open)) filtered-children))
              )
         )
     )
