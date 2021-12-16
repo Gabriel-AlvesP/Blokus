@@ -177,13 +177,13 @@
 ;;  checks if a list(node) exists in the two other lists(open and close)
 ;;  remove the duplic 
 ;;  returns a list with non duplicated nodes
-;; test => (remove-duplicated (list (make-node (board-c)) (make-node (board-d)) (make-node (board-e))) (list (make-node (board-b)) (make-node (board-a)) (make-node (empty-board)))  (list (make-node (board-c))))
+;; test => (remove-duplicated (list (make-node (board-c)) (make-node (board-d))  (make-node (board-e))) 'duplicatedp (list (make-node (board-b)) (make-node (board-a)) (make-node (empty-board)))  (list (make-node (board-c))))
 ;; result => (list  node w/ board-d, node w/ board-e
-(defun remove-duplicated(node-list open  &optional closed) 
+(defun remove-duplicated(node-list duplicated-fun &optional (open nil) closed ) 
         (cond
          ((null node-list) nil)
-         ((duplicatedp (car node-list) open closed) (remove-duplicated (cdr node-list) open closed))
-         (t (cons (car node-list) (remove-duplicated (cdr node-list) open closed)))
+         ((funcall duplicated-fun (car node-list) open closed) (remove-duplicated (cdr node-list) duplicated-fun open closed))
+         (t (cons (car node-list) (remove-duplicated (cdr node-list) duplicated-fun open closed)))
         )
 )
 
@@ -200,8 +200,8 @@
   )
 )
 
-;;
-;;
+
+;; bfs
 ;; (bfs 8 (operations) (list (make-node (board-a))))
 (defun bfs (solution operations open  &optional (closed nil))
   (cond 
@@ -209,7 +209,7 @@
     (t (let* ( 
               (current-node (car open))
               (closed1 (cons current-node closed))
-              (filtered-children (remove-duplicated (expand-node current-node 'possible-moves operations 'bfs) open closed1))
+              (filtered-children (remove-duplicated (expand-node current-node 'possible-moves operations 'bfs) 'duplicatedp open closed1))
               (open1 (append (cdr open) filtered-children))
               (first-solution (get-solution filtered-children solution))
              )
@@ -217,7 +217,7 @@
           ((null first-solution) (bfs solution operations open1 closed1))
           (t first-solution)
          )
-       )
+      )
     )
   )
 )
@@ -227,15 +227,15 @@
 
 ;; get-duplicated
 ;; checks if a node is duplicated
-;; returns a node duplicated in closed
+;; returns a node duplicated in node-list
 ;; test => (duplicated-dfs (make-node (board-b)) (list (make-node (empty-board))) (list (make-node (board-b) nil 1 1 (init-pieces))))
-;; result => (car closed)
-(defun get-duplicated (node closed)
+;; result => (car node-list)
+(defun get-duplicated (node node-list)
   (cond 
-    ((null closed) nil)
+    ((null node-list) nil)
     ;(t (car (remove-nil (mapcar (lambda (x) (cond ((equal (node-state node) (node-state x)) x) (t nil))) closed))))
-    ((equal (node-state node) (node-state (car closed))) (car closed))
-    (t (get-duplicated node (cdr closed)))
+    ((equal (node-state node) (node-state (car node-list))) (car node-list))
+    (t (get-duplicated node (cdr node-list)))
     )
 )
 
@@ -278,34 +278,34 @@
   )
 )
 
-
-
-;; closed-duplicated
-;; 
-;;
-(defun closed-duplicated (node-list open closed)
+;; remove-closed-duplicated
+;; removes the duplicated nodes that cost more than the new generated nodes
+;; returns a list with all closed nodes 
+(defun remove-closed-duplicated (node-list open closed)
   (let ((duplicated-val (duplicated-dfs (car node-list) open closed)))
     (cond 
       ((null node-list) closed)
-      ((numberp duplicated-val) (closed-duplicated (cdr node-list) open closed))
-      (t (closed-duplicated (cdr node-list) open (remove duplicated-val closed)))
+      ((numberp duplicated-val) (remove-closed-duplicated (cdr node-list) open closed))
+      (t (remove-closed-duplicated (cdr node-list) open (remove duplicated-val closed)))
     )
   )
 )
 
 
+;; dfs
+;; 
 (defun dfs (solution operations open max-g  &optional (closed nil))
   (cond 
     ((null open) nil)
     (t (let* ( 
               (current-node (car open))
               (filtered-children (remove-duplicated-dfs (expand-node current-node 'possible-moves operations 'dfs max-g) (cdr open) (cons current-node closed)))
-              (closed1 (closed-duplicated filtered-children (cdr open) (cons current-node closed)))
+              (closed1 (remove-closed-duplicated filtered-children (cdr open) (cons current-node closed)))
               (open1 (append filtered-children (cdr open)))
               (first-solution (get-solution filtered-children solution))
             )
         (cond 
-          ((null first-solution) (bfs solution operations open1 closed1))
+          ((null first-solution) (dfs solution operations open1 max-g closed1))
           (t  first-solution)
         )
       )
@@ -317,37 +317,94 @@
 
 ;; h1
 ;; h(x) = o(x) - c(x)
-;; o - objetivo para o tabuleiro 
-;; c - numero de quadrados preenchidos no tabuleiro
+;; o - board's objective (solution) 
+;; c - how many elements/cells are filled (count-all-elems)
 (defun h1 (solution node)
   (- solution (count-all-elems (node-state node)))
 )
 
 
 ;; h2
-;; 
-;; 
-;; 
-(defun h2 ())
+;; ASAP 
+(defun h2 ()
+  )
 
-;; f 
-;; 
-;;
-(defun f (node)
+;; node-f 
+;; calculates a node cost
+;; returns a number(cost)
+(defun node-f (node)
   (+ (node-depth node) (node-h node))
 )
 
-#|(defun sort (node-list)
-  (let (())
 
+;; duplicatedp-a*
+;; Checks if a node is duplicated in a list(closed)
+;; Returns t if it is duplicated and nil if it is not
+;; test => (duplicatedp-a* (make-node (board-b)) (list (make-node (board-b)) (make-node (board-a)) (make-node (empty-board)))  (list (make-node (board-c))))
+;; result => nil
+(defun duplicatedp-a*(node open closed)
+  (cond 
+    ((exist-nodep node closed) t)
+    (t nil)
   )
 )
 
+;; insert-in-open
+;; inserir expandidos nao repetidos ou com f < que f do no repetido em abertos, em abertos
+;; returns the list of nodes that should be insert in open
+(defun to-insert-in-open (expanded-nodes open)
+  (let (
+        (current (car expanded-nodes))
+        (duplicated-open (get-duplicated current open))
+       )
+    (cond 
+      ((null expanded-nodes) nil)
+      ((null duplicated-open) (cons current (insert-in-open (cdr expanded-nodes) open)))                
+      ((<= (node-f current) (node-f duplicated-open))  (cons current (insert-in-open (cdr expanded-nodes) open)))
+      (t (insert-in-open (cdr expanded-nodes) open))
+    )
+  )
+)
+
+;; get-lowest-node
+;; returns the node with a lowest cost in open
+(defun get-lowest-node (open &aux (lowest-node (first open)))
+  "[open] list of nodes"
+  (let ((open-first (car open)))
+    (cond 
+      ((null open) lowest-node)
+      ((< (node-f lowest-node) (node-f open-first)) (get-lowest-node lowest-node (cdr open)))
+      ((and (= (node-f lowest-node) (node-f open-first)) (>= (node-depth lowest-node) (node-depth open-first)))  (get-lowest-node lowest-node (cdr open)))
+      (t (get-lowest-node (car open) (cdr open)))
+    )
+  ) 
+)
+
+(defun check-duplicated (expanded-nodes open)
+  (let (
+        (current (car expanded-nodes))
+        (duplicated-open (get-duplicated current open))
+       )
+    (cond 
+        ; remove duplicated-open from open
+      (t )                                              ; continue
+    )
+  )
+)
+  
+
+(defun )
+
+;; a* algorithm
 (defun a* (solution operations open &optional (closed nil))
   (cond
     ((null open) nil)
-    (t (let* ))
-  
+    (t (let* (
+              (current-node (car open))
+              (filtered-children (remove-duplicated (expand-node current-node 'possible-moves operations 'bfs) 'duplicatedp-a* open closed1))
+             )
+        )
+    )
   )
 )
 
