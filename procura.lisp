@@ -55,7 +55,7 @@
 ;; Uses one piece and applies an operation with a possible move to create a child from a node 
 ;; returns a node
 ;; test => (get-child (make-node (empty-board)) (car (possible-moves (init-pieces) 'piece-a (empty-board))) 'piece-a)
-(defun get-child(node possible-move operation &aux (pieces-left (node-pieces-left node)) (state (node-state node)) &optional (h 'h0) (solution 0))
+(defun get-child(node possible-move operation &optional (h 'h0) (solution 0) &aux (pieces-left (node-pieces-left node)) (state (node-state node)))
     "Operation must be a function"
     (let ((move (funcall operation pieces-left possible-move state)))
       (cond 
@@ -84,7 +84,10 @@
 ;; return a list of nodes
 ;; test => (expand-node (make-node (empty-board)) 'possible-moves (operations) 'bfs) 
 (defun expand-node(node possible-moves operations alg &optional (g 0) (h 'h0) (solution 0))
-  "possible moves must be a function that returns a list with indexes and the operations "
+  "
+  [possible-moves] must be a function that returns a list with indexes and the operations,
+  [operations] must be a list with all available operations
+  "
   (cond
     ((null operations) nil)
     ((and (equal alg 'dfs) (< g (1+ (node-depth node)))) nil)
@@ -293,7 +296,7 @@
 
 
 ;; dfs
-;; 
+;; (dfs 8 (operations) (list (make-node (board-a))) 2)
 (defun dfs (solution operations open max-g  &optional (closed nil))
   (cond 
     ((null open) nil)
@@ -315,7 +318,16 @@
 
 ;;;  Algoritmo de Procura do Melhor Primeiro (A*)
 
-(defun h0 (solution move)0)
+;; 
+(defun heuristic (solution state alg h-type)
+  (cond 
+    ((or (equal alg 'bfs) (equal alg 'dfs)) 0)
+      ((and (equal alg 'a) (equal h-type 'h2)) (h2))
+    (t (h1 solution state))
+  )
+)
+
+(defun h0 (solution move) solution)
 
 ;; h1
 ;; h(x) = o(x) - c(x)
@@ -328,8 +340,7 @@
 
 ;; h2
 ;; ASAP 
-(defun h2 ()
-  )
+(defun h2 ())
 
 ;; node-f 
 ;; calculates a node cost
@@ -351,26 +362,26 @@
   )
 )
 
-;; insert-in-open
+;; to-insert-in-open
 ;; inserir expandidos nao repetidos ou com f < que f do no repetido em abertos, em abertos
 ;; returns the list of nodes that should be insert in open
 (defun to-insert-in-open (expanded-nodes open)
-  (let (
+  (let* (
         (current (car expanded-nodes))
         (duplicated-open (get-duplicated current open))
        )
     (cond 
       ((null expanded-nodes) nil)
-      ((null duplicated-open) (cons current (insert-in-open (cdr expanded-nodes) open)))                
-      ((<= (node-f current) (node-f duplicated-open))  (cons current (insert-in-open (cdr expanded-nodes) open)))
-      (t (insert-in-open (cdr expanded-nodes) open))
+      ((null duplicated-open) (cons current (to-insert-in-open (cdr expanded-nodes) open)))                
+      ((<= (node-f current) (node-f duplicated-open))  (cons current (to-insert-in-open (cdr expanded-nodes) open)))
+      (t (to-insert-in-open (cdr expanded-nodes) open))
     )
   )
 )
 
 ;; get-lowest-node
 ;; returns the node with a lowest cost in open
-(defun get-lowest-node (open &aux (lowest-node (first open)))
+(defun get-lowest-node (lowest-node open)
   "[open] list of nodes"
   (let ((open-first (car open)))
     (cond 
@@ -378,40 +389,51 @@
       ((< (node-f lowest-node) (node-f open-first)) (get-lowest-node lowest-node (cdr open)))
       ((and (= (node-f lowest-node) (node-f open-first)) (>= (node-depth lowest-node) (node-depth open-first)))  (get-lowest-node lowest-node (cdr open)))
       (t (get-lowest-node (car open) (cdr open)))
-    )
-  ) 
+    )  
+  )
 )
 
 
 ;; check-duplicated
 ;; 
 (defun check-duplicated (expanded-nodes open)
-  (let (
+  "[open] list with nodes"
+  (let* (
         (current (car expanded-nodes))
         (duplicated-open (get-duplicated current open))
        )
-    (cond  
-      (t )   ; remove duplicated-open from open                        
+    (cond
+      ((null expanded-nodes) open)
+      ((null duplicated-open) (check-duplicated (cdr expanded-nodes) open))  
+      (t (check-duplicated (cdr expanded-nodes) (remove duplicated-open open)))   ; remove duplicated-open from open                        
     )
   )
-)
-  
-
-(defun )
+)  
 
 ;; a* algorithm
-(defun a* (solution operations open &optional (closed nil))
+;; test => (a* 72 (operations) (list (make-node (board-f))) 'h1)
+(defun a* (solution operations open heuristic &optional (closed nil))
+  "
+  [solution] must be a number, 
+  [operations] must be a list with all operations available
+  [open] must be an list with nodes
+  "
   (cond
     ((null open) nil)
     (t (let* (
-               (current-node (car open))
-               (closed1 (cons current closed))
+               (current-node (get-lowest-node (car open) open))
+               (closed1 (cons current-node closed))
                (filtered-children (to-insert-in-open 
-                 (remove-duplicated (expand-node current-node 'possible-moves operations 'a) 'duplicatedp-a* open closed1)
+                 (remove-duplicated (expand-node current-node 'possible-moves operations 'a 0 heuristic solution) 'duplicatedp-a* open closed1)
                  (cdr open))
                )
                (open1 (append (check-duplicated filtered-children (cdr open)) filtered-children))
+               (sol (get-solution (list current-node) solution))
              )
+          (cond 
+            ((null sol) (a* solution operations open1 heuristic closed1))
+            (t sol)
+          )
         )
     )
   )
@@ -420,24 +442,26 @@
 ;;; Performance Stats
 
 
-(defun solution-node(sol)
-  (first sol)
+(defun solution-node(solution-list)
+  (first solution-list)
 )
 
-(defun solution-path(solution-node)
-  (cond 
-    ((null node-parent) nil)
-    (t (cons solution-path (solution-path (node-parent solution-node))))
+(defun solution-path(solution-list)
+  (let ((final-node (solution-node solution-list)))
+      (cond 
+        ((null (node-parent final-node)) nil)
+        (t (cons final-node (solution-path (node-parent final-node))))
+    )
   )
 )
 
-(defun generated-nodes(sol)
-  (second sol)
+(defun generated-nodes(solution-list)
+  (second solution-list)
 )
 
 
-(defun penetrance(x y)
-
+(defun penetrance(solution-node generated-nodes)
+  (/ (+ (node-depth solution-node) 1) generated-nodes)
 )
 
 ;;;  Os algoritmos SMA*, IDA* e/ou RBFS (bonus)
