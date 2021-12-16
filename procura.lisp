@@ -60,7 +60,7 @@
     (let ((move (funcall operation pieces-left possible-move state)))
       (cond 
         ((null move) nil)
-        (t (make-node move node (1+ (node-depth node)) (funcall h solution move) (remove-used-piece (node-pieces-left node) operation))) 
+        (t (make-node move node (1+ (node-depth node)) (hts solution move h) (remove-used-piece (node-pieces-left node) operation))) 
       )
     )
 )
@@ -319,15 +319,13 @@
 ;;;  Algoritmo de Procura do Melhor Primeiro (A*)
 
 ;; 
-(defun heuristic (solution state alg h-type)
+(defun hts (solution state h-type)
   (cond 
-    ((or (equal alg 'bfs) (equal alg 'dfs)) 0)
-      ((and (equal alg 'a) (equal h-type 'h2)) (h2))
-    (t (h1 solution state))
+      ((equal h-type 'h0) 0)
+      ((equal h-type 'h2) 0)
+      (t (h1 solution state))
   )
 )
-
-(defun h0 (solution move) solution)
 
 ;; h1
 ;; h(x) = o(x) - c(x)
