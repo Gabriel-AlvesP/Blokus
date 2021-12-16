@@ -95,8 +95,8 @@
 )
 
 ;; load-problems-file
-;  returns all boards of problemas.dat file
-;  teste -> (load-problems-file)
+;; returns all boards of problemas.dat file
+;; teste -> (load-problems-file)
 (defun load-problems-file ()
   (with-open-file (stream (get-problems-path))
     (labels ((read-recursively ()
@@ -108,7 +108,18 @@
     )
 )
 
-
+;; write-file
+;; <algorithm> list with algorithm, start time, end time, duration time, solution-path, depth, board,fator de ramificação média, nº de nós gerados,nº de nós expandidos, penetrância, comprimento da solução
+(defun write-file(algorithm)
+  (with-open-file (stream (get-results-path) :direction :output :if-exists :append :if-does-not-exist :create)
+    (cond
+     ;((condição) (o que fazer))
+     ;((condição) ())
+     ;(() ())
+     (t nil)
+     )
+    )
+  )
 
 
 ;;; User Handler
@@ -116,17 +127,32 @@
 ;; start
 ;; Receive data from the keyboard, by the user in relation to the option he want to choose
 (defun start()
-  (progn
-    (init-menu)
-    (let ((option (read)))
-      (if (or (not (numberp option)) (< option 0) (> option 2))
-          (progn (format t "Opção inválida") (start))
-        (case option
-          ;('1 (progn (let ((solve (exec-search))) (print (caadr solve))) (start)))
-          ('2 (progn (let ((board (read-board-chosen 'start))) (if (listp board) (print (second board)))) (start)))
-          ('0 (format t "Adeus!"))
-          )
-        )
+  (init-menu)
+  (let ((option (read)))
+    (if (and (numberp option) (>= option 0) (<= option 2)) 
+        (cond
+         ((equal option 1) (run-algorithm))
+         ((equal option 2) (choose-board))
+         ((equal option 0) (print "Adeus!"))
+         ) 
+      (print "invalido e volta a chamar a função start")
+      )
+    )
+  )
+  
+;; run-algorithm
+;; run the algorithm chosen by the user
+(defun run-algorithm ()
+  (choose-algorithm)
+  (let ((option (read)))
+    (if (and (numberp option) (>= option 0) (<= option 3))
+        (cond
+         ((equal option 1) (print "executa bfs"))
+         ((equal option 2) (print "executa dfs"))
+         ((equal option 3) (print "executa a*"))
+         ((equal option 0) (start))
+         )
+      (print "opção inválida e chama run-algorithm")
       )
     )
   )
@@ -134,110 +160,101 @@
 ;; read-depth-chosen
 ;  read the depth chosen by the user
 (defun read-depth-chosen ()
-  (if (not (choose-depth))
-      (let ((option (read)))
-         (cond ((eq option '-1) );(exec-search))
-               ((or (not (numberp option)) (< option -1)) 
-                (progn (format t "Opção inválida")) (read-depth-chosen))
-               (t option))))
-)
+  (choose-depth)
+  (let ((option (read)))
+    (cond
+     ((and (numberp option) (equal option -1)) (run-algorithm))
+     ((numberp option) option)
+     (t (read-depth-chosen));;e manda print opção invalida
+     )
+    )
+  )
+
 
 ;; read-heuristic-chosen
 ;  read the heuristic chosen by the user
 (defun read-heuritic-chosen ()
-  (if (not (choose-heuristic))
-      (let ((option (read)))
-         (cond ((eq option '0) );(exec-search))
-               ((or (not (numberp option)) (< option 0)) 
-                (progn (format t "Opção inválida")) (read-heuritic-chosen))
-               ;((eq option 1) 'base-heuristic)
-               ;(T 'best-heuristic)
-     )))
-;)
-)
-
-;; read-board-chosen
-;  read the board chosen by the user
-(defun read-board-chosen(back)
-  (progn (choose-board)
-    (let ((option (read)))
-      (cond ((eq option '0) (funcall back))
-            ((not (numberp option)) 
-             (progn (format t "Opção inválida") (read-board-chosen back))) 
-            (t (let ((boards-list (load-problems-file)))
-                 (if (or (< option 0) (> option (length boards-list))) 
-                     (progn (format t "Opção inválida") (read-board back))
-                   (list option (nth(1- option) boards-list))))))
+  (choose-heuristic)
+  (let ((option (read)))
+    (if (and (numberp option) (>= option 0) (<= option 2))
+        (cond
+         ((equal option 1) (print "executa heuristica base"))
+         ((equal option 2) (print "executa heuristica desenvolvida"))
+         ((equal option 0) (run-algorithm))
+         )
+      (print "opção inválida e chama read-heuritic-chosen")
       )
     )
   )
 
-;; run-algorithm
-;; run the algorithm chosen by the user
-(defun run-algorithm ()
-)
 
-
-
-
-
-;; read-algorithm-chosen 
-;  read the algorithm chosen by the user
-
-
+;; read-board-chosen
+;  read the board chosen by the user
+(defun read-board-chosen(back)
+  (choose-board)
+  (let ((option (read)))
+    (cond 
+     ((not (numberp option)) (read-board-chosen));print opção inválida 
+     ((equal option 0) (funcall back))
+     (t (let* ((list-of-boards (load-problems-file)))
+          (if (and (>= option 0) (<= option (length list-of-boards)))
+              (format t "Opção Inválida");e chamar função (read-board-chosen back)
+            (list option (nth (1- option) list-of-boards))
+            )
+          )
+        )
+     )
+    )
+  )
 
 ;;;Stats
 
-;; write-bfs-dfs-stats
+;; write-bfs-and-dfs-stats
 ;  write the solution and measures for the bfs and dfs algorithms
-#|
-(defun write-bfs-dfs-stats (search)
-  (progn
-    ;(format "~% *** Solução do Tabuleiro: ***")
-    (format "")
-    (format "~%~t> Algoritmo:")
-    (format "~%~t> Início:")
-    (format "~%~t> Fim:")
-    (format "~%~t> Tempo Total:")
-    (format "~%~t> Fator de ramificação média:")
-    (format "~%~t> Número de nós gerados:")
-    (format "~%~t> Número de nós expandidos:")
-    (format "~%~t> Penetrância:")
-    (if (eq search 'dfs)
-        (format "~%~t> Profundidade máxima:"))
-    (format "~%~t> Comprimento da solução:")
-    (format "~%~t> Estado Inicial:")
+;função para o estado inicial e função para o estado final
+(defun write-bfs-dfs-stats ()
+    (format t "~% *** Solução do Tabuleiro: ***")
+    (terpri t)
+    (format t "~%~tAlgoritmo:")
+    (format t"~%~tInício:")
+    (format t"~%~tFim:")
+    (format t"~%~tTempo Total:")
+    (format t"~%~tFator de ramificação média:")
+    (format t"~%~tNúmero de nós gerados:")
+    (format t"~%~tNúmero de nós expandidos:")
+    (format t"~%~tPenetrância:")
+    ;(if (eq search 'dfs)
+    ;    (format t"~%~tProfundidade máxima:"))
+    (format t"~%~tComprimento da solução:")
+    (format t"~%~tEstado Inicial:")
     ;função para mostrar o estado inical do tabuleiro
-    (format "~%~t> Estado Final:")
+    (format t"~%~tEstado Final:")
     ;função para a solução do tabuleiro
-   )
 )
-|#
+
 
 
 ;; write-a*-stats
 ;  write the solution and measures for the a* algorithm
-#|
-(defun write-a*-stats (search)
-  (progn
-    ;(format "~% *** Solução do Tabuleiro: ***")
-    (format "")
-    (format "~%~t> Algoritmo:")
-    (format "~%~t> Início:")
-    (format "~%~t> Fim:")
-    (format "~%~t> Tempo Total:")
-    (format "~%~t> Fator de ramificação média:")
-    (format "~%~t> Número de nós gerados:")
-    (format "~%~t> Número de nós expandidos:")
-    (format "~%~t> Penetrância:")
-    (format "~%~t> Comprimento da solução:")
-    (format "~%~t> Estado Inicial:")
+(defun write-a*-stats () 
+    (format t "~% *** Solução do Tabuleiro: ***")
+    (terpri t)
+    (format t "~%~tAlgoritmo:")
+    (format t "~%~tInício:")
+    (format t "~%~tFim:")
+    (format t "~%~tTempo Total:")
+    (format t "~%~tFator de ramificação média:")
+    (format t "~%~tNúmero de nós gerados:")
+    (format t "~%~tNúmero de nós expandidos:")
+    (format t "~%~tPenetrância:")
+    (format t "~%~tComprimento da solução:")
+    (format t "~%~tEstado Inicial:")
     ;função para mostrar o estado inical do tabuleiro
-    (format "~%~t> Estado Final:")
+    (format t "~%~tEstado Final:")
     ;função para a solução do tabuleiro
-   )
 )
-|#
+
+
 ;; current-time
 ;  returns a list with a actual time (hours minutes seconds)
 (defun current-time()
