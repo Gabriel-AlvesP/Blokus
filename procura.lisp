@@ -225,13 +225,70 @@
 
 ;;;  Algoritmo de Procura do Profundidade Primeiro (DFS)
 
+
+(defun get-duplicated (node closed)
+  (cond 
+    ((null closed) nil)
+    ;(t (car (remove-nil (mapcar (lambda (x) (cond ((equal (node-state node) (node-state x)) x) (t nil))) closed))))
+    ((equal (node-state node) (node-state (car closed))) (car closed))
+    (t (get-duplicated node (cdr closed)))
+    )
+)
+
+;;    ((< (node-depth node) (node-depth duplicated-node)) (remove duplicated-node closed))
+
+;; duplicated-dfs
+;; Checks if a node is duplicated in two list of nodes(open and closed)
+;; returns 
+;;  nil if open is open 
+;;  0 if node is not duplicated and should be added to open
+;;  1 if it should abandon the generated node 
+;;  2 if it should remove the closed node that is duplicated and add to open
+(defun duplicated-dfs (node open closed)
+  (let ((duplicated-node (get-duplicated node closed)))
+    (cond 
+      ((null open) nil)
+      ((null duplicated-node) 0)
+      ((exist-nodep node open) 1)
+      ((< (node-depth node) (node-depth duplicated-node)) duplicated-node)
+      (t 1)
+    )
+  )
+)
+
+;;  remove-duplicated-dfs
+;;  checks if a list(node) exists in the two other lists(open and close)
+;;  remove the 
+;;  returns a list with non duplicated nodes
+(defun remove-duplicated-dfs(node-list open closed) 
+  (let ((duplicated-val (duplicated-dfs (car node-list) open closed)))
+    (cond
+      ((null node-list) closed)
+      ((= 0 duplicated-val) (cons (car node-list) (remove-duplicated-dfs (cdr node-list) open closed)))
+      (t (remove-duplicated-dfs (cdr node-list) open closed))  
+    )
+  )
+)
+
+
+(defun closed-duplicated (node-list open closed)
+  (let ((duplicated-val (duplicated-dfs (car node-list) open closed)))
+    (cond 
+      ((null node-list) closed)
+      ((numberp duplicated-val) (closed-duplicated (cdr node-list) open closed))
+      (t (closed-duplicated (cdr node-list) open (remove duplicated-val closed)))
+    )
+  )
+)
+
+
 (defun dfs (solution operations open max-g  &optional (closed nil))
   (cond 
     ((null open) nil)
     (t (let* ( 
               (current-node (car open))
-              (closed1 (cons current-node closed))
-              (filtered-children (remove-duplicated (expand-node current-node 'possible-moves operations 'dfs max-g) open closed1))
+              (filtered-children (remove-duplicated-dfs (expand-node current-node 'possible-moves operations 'dfs max-g) (cdr open) (cons current-node closed)))
+              (closed1 (closed-duplicated filtered-children (cdr open) (cons current-node closed)))
               (open1 (append filtered-children (cdr open)))
               (first-solution (get-solution filtered-children solution))
             )
@@ -276,10 +333,10 @@
 
 (defun a* (solution operations open &optional (closed nil))
   (cond
-    ((null ))
-    )
-
-
+    ((null open) nil)
+    (t (let* ))
+  
+  )
 )
 
 
