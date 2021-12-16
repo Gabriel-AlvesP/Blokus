@@ -85,20 +85,20 @@
 ;; get-problems-path
 ;  returns the path to the problems.dat file (D:/IPS/3º Ano/1º Semestre/Inteligência Artificial/Blokus/problemas.dat)
 (defun get-problems-path()
-  (make-pathname :host "D" :directory '(:absolute "IPS" "3º Ano" "1º Semestre" "Inteligência Artificial" "Blokus") :name "problemas" :type "dat")   
+  (make-pathname :host "D" :directory '(:absolute "IPS\\3º Ano\\1º Semestre\\Inteligência Artificial\\Blokus") :name "problemas" :type "dat")   
 )
 
 ;; get-solutions-path
 ;  returns the path to the solutions.dat file (D:/IPS/3º Ano/1º Semestre/Inteligência Artificial/Blokus/resultados.dat)
 (defun get-results-path()
-  (make-pathname :host "D" :directory '(:absolute "IPS" "3º Ano" "1º Semestre" "Inteligência Artificial" "Blokus") :name "resultados" :type "dat")
+  (make-pathname :host "D" :directory '(:absolute "IPS\\3º Ano\\1º Semestre\\Inteligência Artificial\\Blokus") :name "resultados" :type "dat")
 )
 
 ;; load-problems-file
 ;; returns all boards of problemas.dat file
 ;; teste -> (load-problems-file)
 (defun load-problems-file ()
-  (with-open-file (stream (get-problems-path))
+  (with-open-file (stream "D:IPS\\3º Ano\\1º Semestre\\Inteligência Artificial\\Blokus\\problemas.dat")
     (labels ((read-recursively ()
                (let ((line (read stream nil 'eof)))
                  (if (eq line 'eof)
@@ -111,8 +111,9 @@
 ;; write-file
 ;; <algorithm> list with algorithm, start time, end time, duration time, solution-path, depth, board,fator de ramificação média, nº de nós gerados,nº de nós expandidos, penetrância, comprimento da solução
 (defun write-file(algorithm)
-  (with-open-file (stream (get-results-path) :direction :output :if-exists :append :if-does-not-exist :create)
+  (with-open-file (stream "D:IPS\\3º Ano\\1º Semestre\\Inteligência Artificial\\Blokus\\resultados.dat" :direction :output :if-exists :append :if-does-not-exist :create)
     (cond
+     (format t "teste")
      ;((condição) (o que fazer))
      ;((condição) ())
      ;(() ())
@@ -230,6 +231,10 @@
     ;função para mostrar o estado inical do tabuleiro
     (format t"~%~tEstado Final:")
     ;função para a solução do tabuleiro
+    (terpri t)
+    (format t"~%~t------ Fim de Execução ------")
+    (terpri t)
+    (terpri t)
 )
 
 
@@ -252,6 +257,10 @@
     ;função para mostrar o estado inical do tabuleiro
     (format t "~%~tEstado Final:")
     ;função para a solução do tabuleiro
+    (terpri t)
+    (format t"~%~t------ Fim de Execução ------")
+    (terpri t)
+    (terpri t)
 )
 
 
