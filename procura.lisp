@@ -225,7 +225,11 @@
 
 ;;;  Algoritmo de Procura do Profundidade Primeiro (DFS)
 
-
+;; get-duplicated
+;; checks if a node is duplicated
+;; returns a node duplicated in closed
+;; test => (duplicated-dfs (make-node (board-b)) (list (make-node (empty-board))) (list (make-node (board-b) nil 1 1 (init-pieces))))
+;; result => (car closed)
 (defun get-duplicated (node closed)
   (cond 
     ((null closed) nil)
@@ -243,27 +247,31 @@
 ;;  nil if open is open 
 ;;  0 if node is not duplicated and should be added to open
 ;;  1 if it should abandon the generated node 
-;;  2 if it should remove the closed node that is duplicated and add to open
+;;  2 if it sho;; test => (duplicated-dfs (make-node (board-b)) (list (make-node (empty-board))) (list (make-node (board-b) nil 1 1 (init-pieces))))uld remove the closed node that is duplicated and add to open
+;;  result => (car closed)
 (defun duplicated-dfs (node open closed)
-  (let ((duplicated-node (get-duplicated node closed)))
+    (let ((duplicated-node (get-duplicated node closed)))
     (cond 
-      ((null open) nil)
-      ((null duplicated-node) 0)
       ((exist-nodep node open) 1)
+      ((null duplicated-node) 0)
       ((< (node-depth node) (node-depth duplicated-node)) duplicated-node)
       (t 1)
-    )
+     )
   )
 )
+ 
 
-;;  remove-duplicated-dfs
-;;  checks if a list(node) exists in the two other lists(open and close)
-;;  remove the 
-;;  returns a list with non duplicated nodes
+
+;; remove-duplicated-dfs
+;; checks if a list(node) exists in the two other lists(open and close)
+;; remove the 
+;; returns a list with non duplicated nodes
+;; test => (remove-duplicated-dfs (list (make-node (empty-board)) (make-node (board-c))) (list (make-node (empty-board))) (list (make-node (board-e))))
+;; result =>  (list node w/ board-c)
 (defun remove-duplicated-dfs(node-list open closed) 
   (let ((duplicated-val (duplicated-dfs (car node-list) open closed)))
     (cond
-      ((null node-list) closed)
+      ((null node-list) nil) 
       ((= 0 duplicated-val) (cons (car node-list) (remove-duplicated-dfs (cdr node-list) open closed)))
       (t (remove-duplicated-dfs (cdr node-list) open closed))  
     )
@@ -271,6 +279,10 @@
 )
 
 
+
+;; closed-duplicated
+;; 
+;;
 (defun closed-duplicated (node-list open closed)
   (let ((duplicated-val (duplicated-dfs (car node-list) open closed)))
     (cond 
@@ -325,7 +337,7 @@
   (+ (node-depth node) (node-h node))
 )
 
-(defun sort (node-list)
+#|(defun sort (node-list)
   (let (())
 
   )
@@ -347,7 +359,7 @@
 
 (defun penetrance())
 
-
+|#
 ;;;  Os algoritmos SMA*, IDA* e/ou RBFS (bonus)
 
 
