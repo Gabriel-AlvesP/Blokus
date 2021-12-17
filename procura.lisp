@@ -65,7 +65,7 @@
         ((null move) nil)
         (t (make-node move node (1+ (node-depth node)) (hts solution move h updated-pieces-list) updated-pieces-list)) 
       )
-    )
+  )
 )
 
 ;; get-children 
@@ -459,13 +459,12 @@
 
 ;; solution-path
 ;; returns all nodes that are included in the solution founded
-(defun solution-path(solution-list)
-  (let ((final-node (solution-node solution-list)))
-      (cond 
-        ((null (node-parent final-node)) nil)
-        (t (cons final-node (solution-path (node-parent final-node))))
-    )
-  )
+(defun solution-path(solution-node)
+  
+  (cond 
+    ((null solution-node) nil)
+    (t (cons solution-node (solution-path (node-parent solution-node))))
+   )
 )
 
 ;; number-of-expanded-nodes 
