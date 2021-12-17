@@ -18,7 +18,7 @@ Para uma melhor organização do projeto, este foi divido em três ficheiros.
 
 ---
 
-## Indice
+## Índice
 
 - [Puzzle](#puzzle)
   - [Problemas](#problemas)
@@ -28,17 +28,21 @@ Para uma melhor organização do projeto, este foi divido em três ficheiros.
   - [Verificações do tabuleiro](#verificacoes-do-tabuleiro)
 - [Procura](#procura)
   - [Tipos de Dados Abstratos](#tipos-de-dados-abstratos)
+  - [Algoritmos](#algoritmos)
   - [Auxiliares](#auxiliares)
+  - [Performance Stats](#performance-stats)
+- [Projeto](#projeto)
+- [Estatisticas](#estatisticas)
 
 ---
 
-## [Puzzle](#puzzle)
+## **[Puzzle](#puzzle)**
 
 Este ficheiro contém o código relacionado com todo o problema, sendo assim responsável, por todos os tabuleiros, todas as verificações de restrições de inserção de peças no tabuleiro, inserção das mesmas, verificação das possíveis posições e contagem das peças.
 
 Para uma melhor organização interna, o ficheiro foi dividido pelas seguintes secções, tabuleiros, funções secundárias, peças e operadores.
 
-### [Problemas](#problemas)
+### **[Problemas](#problemas)**
 
 Para a representação dos tabuleiros dos problemas, foram implementadas funções que retornam uma lista, contendo um conjunto de sublistas. As sublistas representam as várias linhas dos tabuleiros e cada átomo das mesmas, representam o valor da posição das colunas. Para representação do conteúdo do tabuleiro, as posições sem peças estão representadas pelo valor 0, com peças pelo valor 1 e as posições pré preenchidas pelo valor 2. Estes tabuleiros são replicas dos tabuleiros do ficheiros problemas.dat e visam facilitar a testagem das restantes funções implementadas.
 
@@ -162,7 +166,7 @@ De seguida, temos as funções que retornam os vários tabuleiros utilizados.
 )
 ```
 
-### [Componentes do tabuleiro](#componentes)
+### **[Componentes do tabuleiro](#componentes)**
 
 #### [Row](#row)
 
@@ -197,7 +201,7 @@ De seguida, temos as funções que retornam os vários tabuleiros utilizados.
 )
 ```
 
-### [Funções secundárias](#secundary)
+### **[Funções secundárias](#secundary)**
 
 As funções secundárias, são responsáveis por verificações nos elementos dos tabuleiros.
 
@@ -301,7 +305,7 @@ As funções secundárias, são responsáveis por verificações nos elementos d
 )
 ```
 
-### [Verificações do tabuleiro](#verificacoes-do-tabuleiro)
+### **[Verificações do tabuleiro](#verificacoes-do-tabuleiro)**
 
 Nesta secção as funções são responsáveis por verificar, a adjacência entre peças, a primeira posição do tabuleiro, os cantos das peças e se é possível inserir uma peça.
 
@@ -412,7 +416,7 @@ Nesta secção as funções são responsáveis por verificar, a adjacência entr
 )
 ```
 
-### [Operações com Peças](#pecas)
+### **[Operações com Peças](#pecas)**
 
 Esta secção contém as funções referentes à inserção das peças, número de peças a inserir, atualização do número de peças a inserir e verificação de todas as possíveis inserções de peças no tabuleiro.
 
@@ -476,7 +480,7 @@ Esta secção contém as funções referentes à inserção das peças, número 
 )
 ```
 
-### [Operadores](#operadores)
+### **[Operadores](#operadores)**
 
 Nesta secção definimos as funções referentes à quantidade de peças iniciais, lista de todas as operações e a inserção das peças no tabueleiro.
 
@@ -536,15 +540,15 @@ Nesta secção definimos as funções referentes à quantidade de peças iniciai
 
 ---
 
-## [Procura](#procura)
+## **[Procura](#procura)**
 
-### [Tipos de Dados Abstratos](#tipos-de-dados-abstratos)
+### **[Tipos de Dados Abstratos](#tipos-de-dados-abstratos)**
 
 Os tipos abstratos de dados são criados e utilizados para guardar as informações necessárias de modo a facilitar o desenvolvimento de uma solução independentemente do problema enfrentado. Assim sendo, estes dados abstratos podem ser utilizados para tentar resolver qualquer problema com os algoritmos disponíveis.
 
 #### [Make-node](#make-node)
 
-- A função _[make-node](#make-node)_ contrói um nó. Recebe como parametros um tabuleiro (_state_) e opcionalmente um outro no pai (_parent_), a profundidade do no a criar (_g_), o valor da heuristica (_h_) e uma lista com o número restante de peças(_pieces_).
+- A função _[make-node](#make-node)_ contrói um nó. Recebe como parametros um tabuleiro (_state_), uma referencia para o nó pai (_parent_) caso exista, a profundidade do nó a criar (_g_), o valor da heuristica (_h_), caso o algoritmo seja de procura informada, e uma lista com o número restante de peças(_pieces_).
 
 ```lisp
 (defun make-node(state &optional (parent nil) (g 0) (h 0) (pieces '(10 10 15)))
@@ -554,7 +558,7 @@ Os tipos abstratos de dados são criados e utilizados para guardar as informaç�
 
 #### [Node-state](#node-state)
 
-- A função _[node-state](#node-state)_ é utilizada para
+- A função _[node-state](#node-state)_ retorna o estado do nó. O estado de um nó é representado pelo tabuleiro com as peças inseridas (em caso de utilização das operações disponíveis).
 
 ```lisp
 (defun node-state(node)
@@ -564,6 +568,8 @@ Os tipos abstratos de dados são criados e utilizados para guardar as informaç�
 
 #### [Node-parent](#node-parent)
 
+- A função _[node-parent](#node-parent)_ retorna o nó pai do nó, através do ponteiro que este guarda.
+
 ```lisp
 (defun node-parent(node)
   (second node)
@@ -571,6 +577,8 @@ Os tipos abstratos de dados são criados e utilizados para guardar as informaç�
 ```
 
 #### [Node-depth](#node-depth)
+
+- A função _[node-depth](#node-depth)_ retorna a profundidade do nó.
 
 ```lisp
 (defun node-depth(node)
@@ -580,13 +588,28 @@ Os tipos abstratos de dados são criados e utilizados para guardar as informaç�
 
 #### [Node-h](#node-h)
 
+- A função _[node-h](#node-h)_ retorna o valor heuristico do nó. Este valor será sempre constante (0 zero) caso o algoritmo utilizado não seja de procura informada. Caso contrário o valor da _**h**_ variará consoante a heuristica utilizada.
+
 ```lisp
 (defun node-h(node)
   (fourth node)
 )
 ```
 
+#### [Node-f](#node-f)
+
+- A função _[node-f](#node-f)_ retorna o valor de f, que representa o custo de um nó. Esta função é apenas utilizada para os algoritmos de procura informada (_[a\*](#a)_, IDA\*, RBFS e SMA\*).
+
+```lisp
+(defun node-f (node)
+  (+ (node-depth node) (node-h node))
+)
+
+```
+
 #### [Node-pieces-left](#node-pieces-left)
+
+- A função _[node-pieces-left](#node-pieces-left)_ retorna uma lista com o número de peças que ainda se pode pôr, por tipo. Inicialmente a lista deverá ser sempre iniciada com valores predefinidos, (**10** **10** **15**) **peça-a**, **peça-b** e **peça-c**, respetivamente.
 
 ```lisp
 (defun node-pieces-left(node)
@@ -594,11 +617,125 @@ Os tipos abstratos de dados são criados e utilizados para guardar as informaç�
 )
 ```
 
-### [Auxiliares](#auxiliares)
+### **[Algoritmos](#algoritmos)**
 
-As funções auxiliares são utilizadas como suporte aos dados abstratos e aos algoritmos implementados.
+Os algoritmos são funções que executam um conjunto de operações com o objetivo de chegar a um estado final (pré-definido). Estes algoritmos exploram um espaço de possibilidades tentanto vários caminhos possíveis. Este processo consiste num espaço de estados.
+
+#### [BFS](#bfs)
+
+- _[BFS](#bfs)_ significa _Breadth-First Search_, ou seja, métodos de procura - **largura primeiro**.Este algoritmo é de procura não informado e, assim sendo, e tal como o nome indica o algoritmo prioriza a procura de estados em largura.
+- Para que o algoritmo tente resolver o problema é necessário introduzir uma série de dados pré-definidos, tais como:
+  - O estado final, **_solution_**. No caso do **_Blokus_** o número de casas que devem ser preenchidas).
+  - A lista de operadores, _[operations](#operations)_.
+  - A lista de nós abertos, **_open_**, que inicialmente terá apenas o tabuleiro do problema selecionado (_[problemas](#problemas)_).
+- Como dados opcionais temos a lista de fechados (por definição _nil_), o número de nós gerados e expandidos (ambos, por motivos lógicos, 0 por definição), _nodes-number_ e _expanded-nodes_, respetivamente.
+
+```lisp
+(defun bfs (solution operations open  &optional (closed nil) (nodes-number 0) (expanded-nodes 0))
+  "solution must be a number,
+   operations must be a list(must use operations function)"
+
+  (cond
+    ((null open) nil)
+    (t (let* (
+              (current-node (car open))
+              (closed1 (cons current-node closed))
+              (all-children (expand-node current-node 'possible-moves operations 'bfs))
+              (nodes-counter (+ (length all-children) nodes-number))
+              (filtered-children (remove-duplicated all-children 'duplicatedp open closed1))
+              (open1 (append (cdr open) filtered-children))
+              (first-solution (get-solution filtered-children solution))
+             )
+         (cond
+          ((null first-solution) (bfs solution operations open1 closed1 nodes-counter (1+ expanded-nodes)))
+          (t (list first-solution nodes-counter (1+ expanded-nodes)))
+         )
+      )
+    )
+  )
+)
+```
+
+#### [DFS](#dfs)
+
+- _[DFS](#dfs)_ significa _Depth-First Search_, ou seja, métodos de procura - **profundidade primeiro**. Este algoritmo é de procura não informado e tal como o nome indica, o algoritmo prioriza a procura de estados próximos em profundidade.
+- Para que o algoritmo tente resolver o problema é necessário introduzir uma série de dados pré-definidos, tais como:
+  - O estado final, **_solution_**. No caso do **_Blokus_** o número de casas que devem ser preenchidas).
+  - A lista de operadores, _[operations](#operations)_.
+  - A lista de nós abertos, **_open_**, que inicialmente terá apenas o tabuleiro do problema selecionado (_[problemas](#problemas)_).
+  - A profundidade máxima, **_max-g_**, à qual o algoritmo irá procurar estados solução.
+- Como dados opcionais temos a lista de fechados, **_closed_**, (por definição _nil_), o número de nós gerados e expandidos (ambos, por motivos lógicos, 0 por definição), **_nodes-number_** e **_expanded-nodes_**, respetivamente.
+
+```lisp
+(defun dfs (solution operations open max-g  &optional (closed nil) (nodes-number 0) (expanded-nodes 0))
+  (cond
+    ((null open) nil)
+    (t (let* (
+              (current-node (car open))
+              (all-children (expand-node current-node 'possible-moves operations 'dfs max-g))
+              (nodes-counter (+(length all-children) nodes-number))
+              (filtered-children (remove-duplicated-dfs all-children (cdr open) (cons current-node closed)))
+              (closed1 (remove-closed-duplicated filtered-children (cdr open) (cons current-node closed)))
+              (open1 (append filtered-children (cdr open)))
+              (first-solution (get-solution filtered-children solution))
+            )
+        (cond
+          ((null first-solution) (dfs solution operations open1 max-g closed1 nodes-counter (1+ expanded-nodes)))
+          (t (list first-solution nodes-counter (1+ expanded-nodes)))
+        )
+      )
+    )
+  )
+)
+```
+
+#### [A\*](#a)
+
+- _[A\*](#a)_ é um método de procura informado e, como tal, o método prioriza a procura de estados com menor custo, _[node-f](#node-f)_, que por sua vez depende da heuristica utilizada _[hts](#hts)_ e da profundidade do nó _[node-depth](#node-depth)_.
+- Para que o algoritmo tente resolver o problema é necessário introduzir uma série de dados pré-definidos, tais como:
+  - O estado final, **_solution_**. No caso do **_Blokus_** o número de casas que devem ser preenchidas).
+  - A lista de operadores, _[operations](#operations)_.
+  - A lista de nós abertos, **_open_**, que inicialmente terá apenas o tabuleiro do problema selecionado (_[problemas](#problemas)_).
+  - Heuristica, **_heuristic_**, que representa a heuristica escolhida para a seleção de estados.
+- Como dados opcionais temos a lista de fechados, **_closed_**, (por definição _nil_), o número de nós gerados e expandidos (ambos, por motivos lógicos, 0 por definição), **_nodes-number_** e **_expanded-nodes_**, respetivamente.
+
+```lisp
+(defun a* (solution operations open heuristic &optional (closed nil) (nodes-number 0) (expanded-nodes 0))
+  "
+  [solution] must be a number,
+  [operations] must be a list with all operations available
+  [open] must be an list with nodes
+  "
+  (cond
+    ((null open) nil)
+    (t (let* (
+               (current-node (get-lowest-node (car open) open))
+               (closed1 (cons current-node closed))
+               (all-children (expand-node current-node 'possible-moves operations 'a 0 heuristic solution))
+               (nodes-counter (+ (length all-children) nodes-number))
+               (filtered-children (to-insert-in-open (remove-duplicated all-children 'duplicatedp-a* open closed1) (cdr open)))
+               (open1 (append (check-duplicated filtered-children (cdr open)) filtered-children))
+               (sol (get-solution (list current-node) solution))
+             )
+          (cond
+            ((null sol) (a* solution operations open1 heuristic closed1 nodes-counter (1+ expanded-nodes)))
+            (t (list sol nodes-counter (1+ expanded-nodes)))
+          )
+        )
+    )
+  )
+)
+```
+
+### **[Auxiliares](#auxiliares)**
+
+As funções auxiliares são utilizadas como suporte aos dados abstratos, aos algoritmos implementados ou até como suplemento a outras funções secundárias.
 
 #### [Get-child](#get-child)
+
+- A função _[get-child](#get-child)_ utiliza uma peça e aplica uma operação com um dos movimentos possíveis.
+- Cria um nó filho e retorna-o.
+- Utiliza como funções auxiliares _[make-node](#make-node)_, _[remove-used-piece](#remove-used-piece)_ e _[node-pieces-left](#node-pieces-left)_
 
 ```lisp
 (defun get-child(node possible-move operation &optional (h 'h0) (solution 0) &aux (pieces-left (node-pieces-left node)) (state (node-state node)))
@@ -614,6 +751,10 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 
 #### [Get-children](#get-children)
 
+- A função _[get-children](#get-children)_ cria todos os sucessores possíveis a partir de um estado e um tipo de peça.
+- Utiliza como função auxiliar _[get-child](#get-child)_ para criar os vários sucessores para as várias jogadas possíveis.
+- Retorna uma lista com todos os sucessores de um nó aplicados a uma operação/peça.
+
 ```lisp
 (defun get-children(node possible-moves operation &optional (h 'h0) (solution 0))
   (cond
@@ -624,6 +765,10 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 ```
 
 #### [Expand-node](#expand-node)
+
+- A função _[expand-node](#expand-node)_ cria todos os sucessores possíveis de um nó, ou seja, cria os filhos do nó _**node**_, para todas as jogadas possíveis e todas as operações/peças.
+- Retorna uma lista com todos os sucessores.
+- Utiliza como funções auxiliares _[remove-nil](#remove-nil)_, _[possible-moves](#possible-moves)_ e _[get-children](#get-children)_.
 
 ```lisp
 (defun expand-node(node possible-moves operations alg &optional (g 0) (h 'h0) (solution 0))
@@ -645,6 +790,9 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 
 #### [Exist-nodep](#exist-nodep)
 
+- Verifica se o nó, _**node**_, está presente numa lista, _**node-list**_.
+- Utiliza como função auxiliar [node-state](#node-state)
+
 ```lisp
 (defun exist-nodep(node node-list)
   (cond
@@ -655,6 +803,8 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 ```
 
 #### [Count-row-elems](#count-row-elems)
+
+- Conta e retorna o número de casas/elementos de uma linha cujo o numero é igual ao _val_.
 
 ```lisp
 (defun count-row-elems (row &optional (val 1))
@@ -668,6 +818,10 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 
 #### [Count-board-elems](#count-board-elems)
 
+- Conta o número de casas/elementos de cada linha do tabuleiro (_**board**_) cujo o número é igual ao _**val**_.
+- Retorna uma **lista**, em que cada elemento desta, é o número de casas igual a _**val**_ numa linha.
+- Utiliza como função auxiliar [count-row-elems](#count-row-elems).
+
 ```lisp
 (defun count-board-elems (board &optional (val 1))
   (cond
@@ -679,6 +833,9 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 
 #### [Count-all-elems](#count-all-elems)
 
+- Conta e retorna o número total de casas/elementos de um tabuleiro preenchidas/dos com _**val**_.
+- Utiliza como função auxiliar [count-board-elems](#count-board-elems).
+
 ```lisp
 (defun count-all-elems (board &optional (val 1))
     (cond
@@ -689,6 +846,8 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 ```
 
 #### [Solutionp](#solutionp)
+
+- Verifica se um nó (_**node**_) é solução para o problema.
 
 ```lisp
 (defun solutionp (node solution &optional (val 1))
@@ -702,6 +861,9 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 ```
 
 #### [Get-solution](#get-solution)
+
+- Retorna um nó que será possível solução para o problema
+- Caso não encontre solução devolve nil
 
 ```lisp
 (defun get-solution (node-list solution &optional (val 1))
@@ -717,6 +879,9 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 
 #### [Remove-duplicated](#remove-duplicated)
 
+- Verifica se a (_**node-list**_) possui nós com o mesmo estado que os nós presentes em abertos (_**open**_) ou fechados (_**closed**_)
+- Retorna a lista de nós (_**node-list**_) sem os repetidos
+
 ```lisp
 (defun remove-duplicated(node-list duplicated-fun &optional (open nil) closed )
         (cond
@@ -728,6 +893,9 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 ```
 
 #### [Duplicatedp](#duplicatedp)
+
+- Verifica se um nó está presente em alguma das duas listas inseridas por parâmetros (_**open**_ ou _**closed**_).
+- Devolve _t_ se o nó _**node**_ está duplicado e _nil_ em caso contrário.
 
 ```lisp
 (defun duplicatedp (node open &optional closed)
@@ -741,13 +909,329 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos e aos a
 
 #### [Get-duplicated](#get-duplicated)
 
+- Verifica se o nó está duplicado e devolve-o caso, realmente, esteja.
+
 ```lisp
 (defun get-duplicated (node node-list)
   (cond
     ((null node-list) nil)
-    ;(t (car (remove-nil (mapcar (lambda (x) (cond ((equal (node-state node) (node-state x)) x) (t nil))) closed))))
     ((equal (node-state node) (node-state (car node-list))) (car node-list))
     (t (get-duplicated node (cdr node-list)))
     )
 )
 ```
+
+#### [Duplicated-dfs](#duplicated-dfs)
+
+- Checks if a node is duplicated in two list(open and closed)
+- Verifica se um nó está duplicado em duas listas, abertos (_**open**_) ou fechados (_**closed**_).
+- Devolve:
+  - 0, se o nó não está duplicado e deve ser adicionado em abertos
+  - 1 se o nó deve ser abandonado
+  - nó-duplicado (_**duplicated-node**_) se deve remover o nó duplicado em fechados e adicionar o sucessor duplicado em abertos
+
+```lisp
+(defun duplicated-dfs (node open closed)
+    (let ((duplicated-node (get-duplicated node closed)))
+    (cond
+      ((exist-nodep node open) 1)
+      ((null duplicated-node) 0)
+      ((< (node-depth node) (node-depth duplicated-node)) duplicated-node)
+      (t 1)
+     )
+  )
+)
+```
+
+#### [Remove-duplicated-dfs](#remove-duplicated-dfs)
+
+- Devolve uma lista sem nós duplicados
+- Utiliza a função _[duplicated-dfs](#duplicated-dfs)_ como auxiliar, de modo a saber que nós devem ser removidos ou adicionados nas respetivas listas
+
+```lisp
+(defun remove-duplicated-dfs(node-list open closed)
+  (let ((duplicated-val (duplicated-dfs (car node-list) open closed)))
+    (cond
+      ((null node-list) nil)
+      ((= 0 duplicated-val) (cons (car node-list) (remove-duplicated-dfs (cdr node-list) open closed)))
+      (t (remove-duplicated-dfs (cdr node-list) open closed))
+    )
+  )
+)
+```
+
+#### [remove-closed-duplicated](#remove-closed-duplicated)
+
+- Remove os nós duplicados em fechados que têm um custo menor que os sucessores com o mesmo estado.
+- Utilizado no método de procura _[dfs](#dfs)_ para remover da lista de fechados.
+- Delvolve a lista dos fechados atualizada.
+
+```lisp
+(defun remove-closed-duplicated (node-list open closed)
+  (let ((duplicated-val (duplicated-dfs (car node-list) open closed)))
+    (cond
+      ((null node-list) closed)
+      ((numberp duplicated-val) (remove-closed-duplicated (cdr node-list) open closed))
+      (t (remove-closed-duplicated (cdr node-list) open (remove duplicated-val closed)))
+    )
+  )
+)
+```
+
+#### [Hts](#hts)
+
+- A função _[hts](#hts)_ verifica que heuristica deve ser utilizada nos métodos de procura.
+  - Caso o método de procura seja não informado retorna apenas 0
+  - Caso seja ordenado depende da heuristica escolhida
+- Retorna o valor da heuristica de um estado. Utiliza as funções _[h1](#h1)_ e _[h2](#h2)_ para calcular as heuristicas.
+
+```lisp
+(defun hts (solution state h-type child-pieces-list)
+  (cond
+      ((equal h-type 'h0) 0)
+      ((equal h-type 'h2) (h2 solution child-pieces-list))
+      (t (h1 solution state))
+  )
+)
+```
+
+#### [H1](#h1)
+
+- A função _[h1](#h1)_ calcula a heuristica de um nó pela diferença do valor da solução _**solution**_ pelo número total de casas preenchidas. É utilizada como função auxiliar a função _[count-all-elems](#count-all-elems)_ para calcular o número de casas preenchidas.
+
+```lisp
+(defun h1 (solution state)
+  (- solution (count-all-elems state))
+)
+```
+
+#### [H2](#h2)
+
+- A função [h2](#h2) calcula a heuristica de um nó através da diferença entre as peças necessárias para atingir o valor da solução pretendida e a diferença entre o número total das maiores peças (b e c's) e o número de utilizadas da mesma.
+
+```lisp
+(defun h2 (solution child-pieces-list)
+  (let ((to-place (/ solution 4)))                                                  ; solution/4 -> places needed to place to get the objective
+    (- to-place (- 10 (second child-pieces-list)) (- 15 (third child-pieces-list))) ; 10, 15 -> number of the best pieces when the game starts
+  )
+)
+```
+
+#### [Duplicated-a\*](#duplicated-a*)
+
+- Utilizada especificamente para o metodo de procura informada implementado [a\*](#a).
+- Substitui a função [exist-nodep](#exist-nodep) pois esta não pode ser utilizada em [remove-duplicated](#remove-duplicated) (utilizada dentro de a\*).
+
+```lisp
+(defun duplicatedp-a*(node &optional open closed)
+  (cond
+    ((exist-nodep node closed) t)
+    (t nil)
+  )
+)
+```
+
+#### [To-insert-in-open](#to-insert-in-open)
+
+- Insere nós expandidos não repetidos ou com f (_[node-f](#node-f)_), < que f do nó repetido em abertos.
+
+```lisp
+(defun to-insert-in-open (expanded-nodes open)
+  (let* (
+        (current (car expanded-nodes))
+        (duplicated-open (get-duplicated current open))
+       )
+    (cond
+      ((null expanded-nodes) nil)
+      ((null duplicated-open) (cons current (to-insert-in-open (cdr expanded-nodes) open)))
+      ((<= (node-f current) (node-f duplicated-open))  (cons current (to-insert-in-open (cdr expanded-nodes) open)))
+      (t (to-insert-in-open (cdr expanded-nodes) open))
+    )
+  )
+)
+```
+
+#### [Get-lowest-node](#get-lowest-node)
+
+- Utilizada no método de procura informada [a\*](#a).
+- Devolve o no com menor custo.
+
+```lisp
+(defun get-lowest-node (lowest-node open)
+  "[open] list of nodes"
+  (let ((open-first (car open)))
+    (cond
+      ((null open) lowest-node)
+      ((< (node-f lowest-node) (node-f open-first)) (get-lowest-node lowest-node (cdr open)))
+      ((and (= (node-f lowest-node) (node-f open-first)) (>= (node-depth lowest-node) (node-depth open-first)))  (get-lowest-node lowest-node (cdr open)))
+      (t (get-lowest-node (car open) (cdr open)))
+    )
+  )
+)
+```
+
+#### [Check-duplicated](#check-duplicated)
+
+- Verifica se existe algum nó duplicado em abertos que deve ser removido
+- Utilizado no método de procura informada implementado - [a\*](#a)
+
+```lisp
+(defun check-duplicated (expanded-nodes open)
+  "[open] list with nodes"
+  (let* (
+        (current (car expanded-nodes))
+        (duplicated-open (get-duplicated current open))
+       )
+    (cond
+      ((null expanded-nodes) open)
+      ((null duplicated-open) (check-duplicated (cdr expanded-nodes) open))
+      (t (check-duplicated (cdr expanded-nodes) (remove duplicated-open open)))
+    )
+  )
+)
+```
+
+### **[Performance Stats](#performance-stats)**
+
+#### [Solution-node](#solution-node)
+
+- Retorna o nó solução
+
+```lisp
+(defun solution-node(solution-list)
+  (first solution-list)
+)
+```
+
+#### [Solution-path](#solution-path)
+
+- Retorna o caminho, desde o tabuleiro vazio até ao nó solução.
+
+```lisp
+(defun solution-path(solution-list)
+  (let ((final-node (solution-node solution-list)))
+      (cond
+        ((null (node-parent final-node)) nil)
+        (t (cons final-node (solution-path (node-parent final-node))))
+    )
+  )
+)
+```
+
+#### [Number-of-expanded-nodes](#number-of-expanded-nodes)
+
+- Retorna o número de nós expandidos, a partir da solução retornada na aplicação num dos algoritmos implementados (_[bfs](#bfs)_, _[dfs](#dfs)_ ou _[a\*](#a)_).
+
+```lisp
+(defun number-of-expanded-nodes (solution-list)
+  "[solution-list] list with all execution info"
+  (third solution-list)
+)
+```
+
+#### [Generated-nodes](#generated-nodes)
+
+- Retorna o número de nós gerados, a partir da solução retornada na aplicação num dos algoritmos implementados (_[bfs](#bfs)_, _[dfs](#dfs)_ ou _[a\*](#a)_).
+
+```lisp
+(defun generated-nodes(solution-list)
+  "[solution-list] list with all execution info"
+  (second solution-list)
+)
+```
+
+#### [Piercing-factor](#piercing-factor)
+
+- Penetrância
+- É o caminho até ao nó objetivo a dividir pelo numero de nós gerados
+
+```lisp
+(defun piercing-factor(solution-list)
+  "[solution-list] list with all execution info"
+  (/ (+ (node-depth (solution-node solution-list)) 1) (generated-nodes solution-list))
+)
+```
+
+#### [Average-branching-factor](#average-branching-factor)
+
+- Fator de ramificação médio. Aplica
+
+```lisp
+(defun average-branching-factor (solution-list maximum tolerance &optional (minimum 0))
+  "
+  [solution-list] list with all execution info,
+  [maximum] value must be the result of \"generated-nodes\",
+  [tolerance] must be a number
+  "
+  (let* (
+          (n-nodes (generated-nodes solution-list))
+          (g (node-depth (solution-node solution-list)))
+          (average-min-max (/ (+ maximum minimum) 2))                       ; media como fator de ramificacao
+          (average-generated-n (average-generated-nodes average-min-max g))
+          (diff (- n-nodes average-generated-n))
+        )
+      (cond
+        ((< diff tolerance) average-min-max)
+        ((< average-generated-n n-nodes) (average-branching-factor solution-list maximum average-generated-n))
+        (t (average-branching-factor solution-list average-generated-n minimum))
+      )
+  )
+)
+```
+
+#### [average-generated-nodes](#averages-generated-nodes)
+
+- Função auxiliar para a função _[average-branching-factor](#average-branching-factor)_.
+- Calcula o número de nós gerados usando a média como fator de ramificação
+
+```lisp
+(defun average-generated-nodes (average g)
+  "
+  [average] must be a number,
+  [g] must be a numebr
+  "
+  (cond
+    ((= 1 g) 0)
+    (t (+ (expt average g) (average-generated-nodes average (1- g))))
+  )
+)
+```
+
+## **[Projeto](#projeto)**
+
+.
+
+.
+
+.
+
+## **[Estatisticas](#estatisticas)**
+
+| Tabuleiro |         Algoritmo          | Nós Gerados | Nós Expandidos | Penetrância | Fator de Ramificação | Duração |
+| :-------: | :------------------------: | :---------: | :------------: | :---------: | :------------------: | :-----: |
+|    `A`    |            BFS             |     11      |       3        |    3/11     |                      |         |
+|    `A`    |            DFS             |     11      |       8        |    3/11     |                      |         |
+|    `A`    | A\* - Heurística Fornecida |      6      |       3        |     1/2     |                      |         |
+|    `A`    |  A\* - Heurística Criada   |      6      |       3        |     1/2     |                      |         |
+|    `B`    |            BFS             |    11553    |      936       |   2/3851    |                      |         |
+|    `B`    |            DFS             |    9468     |      5895      |   1/1578    |                      |         |
+|    `B`    | A\* - Heurística Fornecida |     43      |       6        |    6/43     |                      |         |
+|    `B`    |  A\* - Heurística Criada   |     43      |       6        |    6/43     |                      |         |
+|    `C`    |            BFS             |      -      |       -        |      -      |          -           |    -    |
+|    `C`    |            DFS             |      -      |       -        |      -      |          -           |    -    |
+|    `C`    | A\* - Heurística Fornecida |     75      |       8        |    8/75     |                      |         |
+|    `C`    |  A\* - Heurística Criada   |     75      |       8        |    8/75     |                      |         |
+|    `D`    |            BFS             |      -      |       -        |      -      |          -           |    -    |
+|    `D`    |            DFS             |      -      |       -        |      -      |          -           |    -    |
+|    `D`    | A\* - Heurística Fornecida |     145     |       10       |    2/29     |                      |         |
+|    `D`    |  A\* - Heurística Criada   |     145     |       10       |    2/29     |                      |         |
+|    `E`    |            BFS             |      -      |       -        |      -      |          -           |    -    |
+|    `E`    |            DFS             |      -      |       -        |      -      |          -           |    -    |
+|    `E`    | A\* - Heurística Fornecida |     216     |       13       |   13/216    |                      |         |
+|    `E`    |  A\* - Heurística Criada   |     216     |       13       |   13/216    |                      |         |
+|    `F`    |            BFS             |      -      |       -        |      -      |          -           |    -    |
+|    `F`    |            DFS             |      -      |       -        |      -      |          -           |    -    |
+|    `F`    | A\* - Heurística Fornecida |     327     |       19       |   19/327    |                      |         |
+|    `F`    |  A\* - Heurística Criada   |     327     |       19       |   19/327    |                      |         |
+
+- **_\- significa que a memória heap do \_lispWorks_ chegou ao limite.\_**

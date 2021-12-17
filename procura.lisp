@@ -252,10 +252,9 @@
 ;; duplicated-dfs
 ;; Checks if a node is duplicated in two list(open and closed)
 ;; returns 
-;; nil if open is open 
 ;; 0 if node is not duplicated and should be added to open
 ;; 1 if it should abandon the generated node 
-;; 2 if it should remove the closed node that is duplicated and add to open
+;; duplicated-node if it should remove the closed node that is duplicated and add to open
 ;; test => (duplicated-dfs (make-node (board-b)) (list (make-node (empty-board))) (list (make-node (board-b) nil 1 1 (init-pieces))))
 ;; result => (car closed)
 (defun duplicated-dfs (node open closed)
