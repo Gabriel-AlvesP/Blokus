@@ -1217,29 +1217,29 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos, aos al
 
 | Tabuleiro |         Algoritmo          | Nós Gerados | Nós Expandidos | Penetrância | Fator de Ramificação | Duração |
 | :-------: | :------------------------: | :---------: | :------------: | :---------: | :------------------: | :-----: |
-|    `A`    |            BFS             |     11      |       3        |    3/11     |                      |         |
-|    `A`    |            DFS             |     11      |       8        |    3/11     |                      |         |
-|    `A`    | A\* - Heurística Fornecida |      6      |       3        |     1/2     |                      |         |
-|    `A`    |  A\* - Heurística Criada   |      6      |       3        |     1/2     |                      |         |
-|    `B`    |            BFS             |    11553    |      936       |   2/3851    |                      |         |
-|    `B`    |            DFS             |    9468     |      5895      |   1/1578    |                      |         |
-|    `B`    | A\* - Heurística Fornecida |     43      |       6        |    6/43     |                      |         |
-|    `B`    |  A\* - Heurística Criada   |     43      |       6        |    6/43     |                      |         |
+|    `A`    |            BFS             |     11      |       3        |    3/11     |         11/2         |    5    |
+|    `A`    |            DFS             |     11      |       8        |    3/11     |         11/2         |  27521  |
+|    `A`    | A\* - Heurística Fornecida |      6      |       3        |     1/2     |          3           |  2407   |
+|    `A`    |  A\* - Heurística Criada   |      6      |       3        |     1/2     |          3           |  4437   |
+|    `B`    |            BFS             |    11553    |      936       |   2/3851    |       11553/2        |  2777   |
+|    `B`    |            DFS             |    9468     |      5895      |   1/1578    |       41185/2        |  26882  |
+|    `B`    | A\* - Heurística Fornecida |     43      |       6        |    6/43     |         43/2         |  1249   |
+|    `B`    |  A\* - Heurística Criada   |     43      |       6        |    6/43     |         43/2         |  2476   |
 |    `C`    |            BFS             |      -      |       -        |      -      |          -           |    -    |
 |    `C`    |            DFS             |      -      |       -        |      -      |          -           |    -    |
-|    `C`    | A\* - Heurística Fornecida |     75      |       8        |    8/75     |                      |         |
-|    `C`    |  A\* - Heurística Criada   |     75      |       8        |    8/75     |                      |         |
+|    `C`    | A\* - Heurística Fornecida |     75      |       8        |    8/75     |         75/2         |  1498   |
+|    `C`    |  A\* - Heurística Criada   |     75      |       8        |    8/75     |         75/2         |   921   |
 |    `D`    |            BFS             |      -      |       -        |      -      |          -           |    -    |
 |    `D`    |            DFS             |      -      |       -        |      -      |          -           |    -    |
-|    `D`    | A\* - Heurística Fornecida |     145     |       10       |    2/29     |                      |         |
-|    `D`    |  A\* - Heurística Criada   |     145     |       10       |    2/29     |                      |         |
+|    `D`    | A\* - Heurística Fornecida |     145     |       10       |    2/29     |        145/2         |  1245   |
+|    `D`    |  A\* - Heurística Criada   |     145     |       10       |    2/29     |        145/2         |   961   |
 |    `E`    |            BFS             |      -      |       -        |      -      |          -           |    -    |
 |    `E`    |            DFS             |      -      |       -        |      -      |          -           |    -    |
-|    `E`    | A\* - Heurística Fornecida |     216     |       13       |   13/216    |                      |         |
-|    `E`    |  A\* - Heurística Criada   |     216     |       13       |   13/216    |                      |         |
+|    `E`    | A\* - Heurística Fornecida |     216     |       13       |   13/216    |         108          |  1073   |
+|    `E`    |  A\* - Heurística Criada   |     216     |       13       |   13/216    |         108          |  1628   |
 |    `F`    |            BFS             |      -      |       -        |      -      |          -           |    -    |
 |    `F`    |            DFS             |      -      |       -        |      -      |          -           |    -    |
-|    `F`    | A\* - Heurística Fornecida |     327     |       19       |   19/327    |                      |         |
-|    `F`    |  A\* - Heurística Criada   |     327     |       19       |   19/327    |                      |         |
+|    `F`    | A\* - Heurística Fornecida |     327     |       19       |   19/327    |        327/2         |  1017   |
+|    `F`    |  A\* - Heurística Criada   |     327     |       19       |   19/327    |        327/2         |   940   |
 
 - **_\- significa que a memória heap do \_lispWorks_ chegou ao limite.\_**
