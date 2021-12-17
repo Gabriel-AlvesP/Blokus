@@ -57,10 +57,13 @@
 ;; test => (get-child (make-node (empty-board)) (car (possible-moves (init-pieces) 'piece-a (empty-board))) 'piece-a)
 (defun get-child(node possible-move operation &optional (h 'h0) (solution 0) &aux (pieces-left (node-pieces-left node)) (state (node-state node)))
     "Operation must be a function"
-    (let ((move (funcall operation pieces-left possible-move state)))
+    (let (
+          (move (funcall operation pieces-left possible-move state))
+          (updated-pieces-list (remove-used-piece pieces-left operation))  
+          )
       (cond 
         ((null move) nil)
-        (t (make-node move node (1+ (node-depth node)) (hts solution move h) (remove-used-piece (node-pieces-left node) operation))) 
+        (t (make-node move node (1+ (node-depth node)) (hts solution move h updated-pieces-list) updated-pieces-list)) 
       )
     )
 )
@@ -123,7 +126,7 @@
     )
 )
 
-;; cells-pieces-by-row
+;;  count-board-elems
 ;;  Receive a list(board) with sublists(rows) and count the elements with the val(value)
 ;;  returns a list with each result of count-row-elems(row);
 ;;  test => (count-row-elems (list 1 0 0 1 1 1) 0)
@@ -324,10 +327,10 @@
 
 ;; hts
 ;; selects the heuristic choosed
-(defun hts (solution state h-type)
+(defun hts (solution state h-type child-pieces-list)
   (cond 
       ((equal h-type 'h0) 0)
-      ((equal h-type 'h2) 0)
+      ((equal h-type 'h2) (h2 solution child-pieces-list))
       (t (h1 solution state))
   )
 )
@@ -343,7 +346,11 @@
 
 ;; h2
 ;; ASAP 
-(defun h2 ())
+(defun h2 (solution child-pieces-list)
+  (let ((to-place (/ solution 4)))                                                  ; solution/4 -> places needed to place to get the objective
+    (- to-place (- 10 (second child-pieces-list)) (- 15 (third child-pieces-list))) ; 10, 15 -> number of the best pieces when the game starts
+  )
+)
 
 ;; node-f 
 ;; calculates a node cost
