@@ -62,22 +62,25 @@
 
 ;; choose-board 
 ;; shows the board choice menu
-(defun choose-board(&optional(i 1) (boards (load-problems-file)))	
-  (cond
-   ((null boards) 
-    (progn   
-      (format t "~%|                     0 - Voltar                            |")
-      (format t "~%\\___________________________________________________________/~%~%>")) )
-   (t (progn 
-        (if (= i 1) 
-            (progn 
-              (format t "~% ___________________________________________________________")
-              (format t "~%/                        BLOKUS UNO                         \\")
-              (format t "~%|                   Escolha o Tabuleiro                     |")))
-        (format t "~%|                     ~a - Tabuleiro ~a                       |" i i) 
-        (choose-board (+ i 1) (cdr boards))))
-   )
-  )
+(defun choose-board()
+  (format t "~%__________________________________________________________")
+  (format t "~%\\                      BLOKUS UNO                        /")
+  (format t "~%/                  Escolha um tabulerio                  \\")
+  (format t "~%\\                  1 - 1º Tabuleiro                      /")
+  (board-solution (load-problems-file) 1)
+  (format t "~%\\                  2 - 2º Tabuleiro                      /")
+  (board-solution (load-problems-file) 2)
+  (format t "~%\\                  3 - 3º Tabuleiro                      /")
+  (board-solution (load-problems-file) 3)
+  (format t "~%\\                  4 - 4º Tabuleiro                      /")
+  (board-solution (load-problems-file) 4)
+  (format t "~%\\                  5 - 5º Tabuleiro                      /")
+  (board-solution (load-problems-file) 5)
+  (format t "~%\\                  6 - 6º Tabuleiro                      /")
+  (board-solution (load-problems-file) 6)
+  (format t "~%\\                                                        /")
+  (format t "~%/________________________________________________________\\~%~%> ")
+)
 
 
 ;;; Files Handler
@@ -106,25 +109,33 @@
     )
   )
 
-(defun format-problems-file (board &optional (stream t))
-  (if (not (null board))  
-      (cond
-       ((not (null board)) (mapcar #'(lambda(x) (format stream "~% ~a" x)) board)))
-    (print "Ficheiro vazio")
-    )
+;; get-board-to-use
+;; returns the board
+;; teste -> (get-board-to-use (load-problems-file) 1)
+(defun get-board (file number)
+  (cond  
+   ((= number 1) (car (nth 1 file)))
+   ((= number 2) (car (nth 3 file)))
+   ((= number 3) (car (nth 5 file)))
+   ((= number 4) (car (nth 7 file)))
+   ((= number 5) (car (nth 9 file)))
+   ((= number 6) (car (nth 11 file)))
+   (t nil))
   )
 
-
-(defun teste (lst)
-  (if (null lst)
-    0                    ; empty list => length is 0
-    (let ((c (car lst))) ; bind first element to c
-      (if (listp c)      ; if it's a list
-        (+ (teste c) (teste (cdr lst))) ; recurse down + process the rest of the list
-        (cond           ; else
-         (eq c 'eof) (format t "~% ~a " c)              ; not a list -> print item, then
-          (1+ (teste (cdr lst))))))))
-
+;; board-solution
+;; returns board-solution 
+;; teste -> (get-board-solution (load-problems-file) 1)
+(defun board-solution (file number)
+  (cond
+   ((= number 1) (cadr (nth 1 file)))
+   ((= number 2) (cadr (nth 3 file)))
+   ((= number 3) (cadr (nth 5 file)))
+   ((= number 4) (cadr (nth 7 file)))
+   ((= number 5) (cadr (nth 9 file)))
+   ((= number 6) (cadr (nth 11 file)))
+   (t nil))
+  ) 
 
 
 ;; write-file
@@ -168,19 +179,19 @@
         (cond
          ((equal option 1) 
           (progn  
-            (let* ((solution-number (read-board-chosen))
-                   (board (get-board solution-number))) 
-              (bfs solution-number (operations) (list (make-node board))))))
+            (let* ((solution-number (read-board-chosen)))
+                   ;(board (get-board solution-number))) 
+              (bfs (board-solution (load-problems-file) solution-number) (operations) (list (make-node (get-board (load-problems-file) solution-number)))))))
          ((equal option 2) 
           (progn 
             (let* ((solution-number (read-board-chosen))
                    (depth (read-depth-chosen)))
-              (dfs solution-number (operations) (list (make-node (board-a))) depth))))
+              (dfs (board-solution (load-problems-file) solution-number) (operations) (list (make-node (get-board (load-problems-file) solution-number))) depth))))
          ((equal option 3) 
           (progn
             (let* ((solution-number (read-board-chosen))
                    (heuristic (read-heuritic-chosen)))
-              (a* solution-number (operations) (list (make-node (empty-board))) heuristic))))
+              (a* (board-solution (load-problems-file) solution-number) (operations) (list (make-node (get-board (load-problems-file) solution-number))) heuristic))))
          ((equal option 0) (start))
          )
       (progn (format t"~% Opção inválida.~% Tente novamente.") (run-algorithm))
@@ -226,32 +237,12 @@
   (choose-board)
   (let ((option (read)))
     (if (and (numberp option) (>= option 0) (<= option 6))
-        (board-solution option)
+        option
       (progn (format t"~% Opção inválida.~% Tente novamente.") (read-board-chosen))
       )
     )
   )
 
-(defun get-board(number)
-  (cond
-   ((equal number 1) 'board-a)
-   ((equal number 2) 'board-b)
-   ((equal number 3) 'board-c)
-   ((equal number 4) 'board-d)
-   ((equal number 5) 'board-e)
-   ((equal number 6) 'empty-board))
-  )
-
-(defun board-solution (solution)
-  (cond
-   ((equal solution 1) 8)
-   ((equal solution 2) 20)
-   ((equal solution 3) 28)
-   ((equal solution 4) 36)
-   ((equal solution 5) 44)
-   ((equal solution 6) 72)
-   ((equal solution 0) (run-algorithm)))
-  )
 
 ;;;Stats
 
