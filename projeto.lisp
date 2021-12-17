@@ -66,21 +66,33 @@
   (format t "~%__________________________________________________________")
   (format t "~%\\                      BLOKUS UNO                        /")
   (format t "~%/                  Escolha um tabulerio                  \\")
-  (format t "~%\\                  1 - 1º Tabuleiro                      /")
-  (board-solution (load-problems-file) 1)
-  (format t "~%\\                  2 - 2º Tabuleiro                      /")
-  (board-solution (load-problems-file) 2)
-  (format t "~%\\                  3 - 3º Tabuleiro                      /")
-  (board-solution (load-problems-file) 3)
-  (format t "~%\\                  4 - 4º Tabuleiro                      /")
-  (board-solution (load-problems-file) 4)
-  (format t "~%\\                  5 - 5º Tabuleiro                      /")
-  (board-solution (load-problems-file) 5)
-  (format t "~%\\                  6 - 6º Tabuleiro                      /")
-  (board-solution (load-problems-file) 6)
+  (format t "~%                  1 - 1º Tabuleiro                      /~%")
+  (format-board-to-listener (get-board (load-problems-file) 1))
+  (format t "~%                  2 - 2º Tabuleiro                      ~%")
+  (format-board-to-listener (get-board (load-problems-file) 2))
+  (format t "~%                  3 - 3º Tabuleiro                      ~%")
+  (format-board-to-listener (get-board (load-problems-file) 3))
+  (format t "~%                  4 - 4º Tabuleiro                      ~%")
+  (format-board-to-listener (get-board (load-problems-file) 4))
+  (format t "~%                  5 - 5º Tabuleiro                      ~%")
+  (format-board-to-listener (get-board (load-problems-file) 5))
+  (format t "~%                  6 - 6º Tabuleiro                      ~%")
+  (format-board-to-listener (get-board (load-problems-file) 6))
   (format t "~%\\                                                        /")
   (format t "~%/________________________________________________________\\~%~%> ")
 )
+
+;; read-board-chosen
+;; read the board chosen by the user
+(defun read-board-chosen()
+  (choose-board)
+  (let ((option (read)))
+    (if (and (numberp option) (>= option 0) (<= option 6))
+        option
+      (progn (format t"~% Opção inválida.~% Tente novamente.") (read-board-chosen))
+      )
+    )
+  )
 
 
 ;;; Files Handler
@@ -138,20 +150,60 @@
   ) 
 
 
+
+
+
 ;; write-file
 ;; <algorithm> list with algorithm, start time, end time, duration time, solution-path, depth, board,fator de ramificação média, nº de nós gerados,nº de nós expandidos, penetrância, comprimento da solução
-(defun write-file(algorithm)
-  (with-open-file (stream (get-results-path) :direction :output :if-exists :append :if-does-not-exist :create)
-    (cond
-     (format t "teste")
-     ;((condição) (o que fazer))
-     ;((condição) ())
-     ;(() ())
-     (t nil)
-     )
+(defun write-file(solution start end)
+  (with-open-file (stream "D:\\IPS\\3º Ano\\1º Semestre\\Inteligência Artificial\\Blokus\\resultados.dat" :direction :output :if-exists :append :if-does-not-exist :create)
+    (format stream "~% *** Solução do Tabuleiro: ***")
+    (terpri stream)
+    (format stream"~%~tInício: ~a" start)
+    (format stream"~%~tFim: ~a" end)
+    (format stream"~%~tDuração: ~a" (- end start))
+    (format stream"~%~tFator de ramificação média: ~a" (average-branching-factor solution (generated-nodes solution) 2))
+    (format stream"~%~tNúmero de nós gerados: ~a" (generated-nodes solution))
+    (format stream"~%~tNúmero de nós expandidos: ~a" (number-of-expanded-nodes solution)) 
+    (format stream"~%~tPenetrância: ~a" (piercing-factor solution))
+    (format stream"~%~tComprimento da solução: ~a" (solution-length solution))
+    (format stream"~%~tCaminho da solução: ~%")
+    (format stream (format-solution-path (solution-path(solution-node solution))) )
+    (terpri stream)
+    (format stream"~%~t------ Fim de Execução ------")
+    (terpri stream)
+    (terpri stream)
     )
   )
 
+(defun format-board-line (board)
+  (cond
+   ((null (first board)) "")
+   (t (format nil "~a~%" (first board)))
+   )
+)
+
+(defun format-board (board)
+  (cond
+   ((null board) "")
+   (t (format nil "~a~a" (format-board-line board) (format-board (cdr board))))
+   )
+  )  
+
+(defun format-solution-path (path)
+  (cond
+   ((null path) "")
+   (t (format nil "~a~%~a" (format-board (first (first path))) (format-solution-path (cdr path))))
+   )
+)
+
+(defun format-board-to-listener (board)
+  (cond
+   ((null board) nil)
+   (t 
+    (progn (format t "~a~%" (first board) (format-board-to-listener (cdr board)))))
+   )
+  )
 
 ;;; User Handler
 
@@ -163,43 +215,46 @@
     (if (and (numberp option) (>= option 0) (<= option 1)) 
         (cond
          ((equal option 1) (run-algorithm))
-         ((equal option 0) (print "Adeus!"))
-         ) 
+         ((equal option 0) (format t "~%Adeus!"))) 
       (progn (print "Opção inválida. Tente novamente") (start))
       )
     )
   )
+
   
 ;; run-algorithm
 ;; run the algorithm chosen by the user
 (defun run-algorithm ()
-  (choose-algorithm)
-  (let ((option (read)))
-    (if (and (numberp option) (>= option 0) (<= option 3))
-        (cond
-         ((equal option 1) 
-          (progn  
-            (let* ((solution-number (read-board-chosen)))
-                   ;(board (get-board solution-number))) 
-              (bfs (board-solution (load-problems-file) solution-number) (operations) (list (make-node (get-board (load-problems-file) solution-number)))))))
-         ((equal option 2) 
-          (progn 
-            (let* ((solution-number (read-board-chosen))
-                   (depth (read-depth-chosen)))
-              (dfs (board-solution (load-problems-file) solution-number) (operations) (list (make-node (get-board (load-problems-file) solution-number))) depth))))
-         ((equal option 3) 
-          (progn
-            (let* ((solution-number (read-board-chosen))
-                   (heuristic (read-heuritic-chosen)))
-              (a* (board-solution (load-problems-file) solution-number) (operations) (list (make-node (get-board (load-problems-file) solution-number))) heuristic))))
+  (progn
+    (choose-algorithm)
+    (let ((option (read)))
+      (if (and (numberp option) (>= option 0) (<= option 3))
+          (let* ((solution-number (read-board-chosen))
+                 (start-time (current-time))
+                 (final-node 
+                  (cond
+                   ((equal option 1)   
+                    (bfs (board-solution (load-problems-file) solution-number) (operations) (list (make-node (get-board (load-problems-file) solution-number)))))
+                   ((equal option 2) 
+                    
+                    (let* ((depth (read-depth-chosen)))
+                      (dfs (board-solution (load-problems-file) solution-number) (operations) (list (make-node (get-board (load-problems-file) solution-number))) depth)))
+                   ((equal option 3) 
+                    
+                    (let* ((heuristic (read-heuritic-chosen)))
+                    (a* (board-solution (load-problems-file) solution-number) (operations) (list (make-node (get-board (load-problems-file) solution-number))) heuristic)))
          ((equal option 0) (start))
          )
-      (progn (format t"~% Opção inválida.~% Tente novamente.") (run-algorithm))
-      )
+                              )
+                 (end (current-time))
+                 )   
+            (write-file final-node start-time end)
+            )
+        )
+      ) 
     )
   )
-   
-
+  
 ;; read-depth-chosen
 ;; read the depth chosen by the user
 (defun read-depth-chosen ()
@@ -208,7 +263,7 @@
     (cond
      ((and (numberp option) (equal option -1)) (run-algorithm))
      ((numberp option) option)
-     (t (read-depth-chosen));;e manda print opção invalida
+     (t  (progn (format t"~% Opção inválida.~% Tente novamente.") (read-depth-chosen)))
      )
     )
   )
@@ -222,87 +277,43 @@
     (if (and (numberp option) (>= option 0) (<= option 2))
         (cond
          ((equal option 1) 'h1)
-         ((equal option 2) (print "executa heuristica desenvolvida"))
+         ((equal option 2) 'h2)
          ((equal option 0) (run-algorithm))
          )
-      (print "opção inválida e chama read-heuritic-chosen")
+      (progn (format t"~% Opção inválida.~% Tente novamente.") (read-heuritic-chosen))
       )
     )
   )
 
 
-;; read-board-chosen
-;; read the board chosen by the user
-(defun read-board-chosen()
-  (choose-board)
-  (let ((option (read)))
-    (if (and (numberp option) (>= option 0) (<= option 6))
-        option
-      (progn (format t"~% Opção inválida.~% Tente novamente.") (read-board-chosen))
-      )
-    )
-  )
+
 
 
 ;;;Stats
 
 ;; write-bfs-and-dfs-stats
 ;; write the solution and measures for the bfs and dfs algorithms
-;função para o estado inicial e função para o estado final
-(defun write-bfs-dfs-stats ()
-    (format t "~% *** Solução do Tabuleiro: ***")
-    (terpri t)
-    (format t "~%~tAlgoritmo: ~a" )
-    (format t"~%~tInício:")
-    (format t"~%~tFim:")
-    (format t"~%~tTempo Total:")
-    (format t"~%~tFator de ramificação média:")
-    (format t"~%~tNúmero de nós gerados:")
-    (format t"~%~tNúmero de nós expandidos:")
-    (format t"~%~tPenetrância:")
-    ;(if (eq search 'dfs)
-    ;    (format t"~%~tProfundidade máxima:"))
-    (format t"~%~tComprimento da solução:")
-    (format t"~%~tEstado Inicial:")
-    ;função para mostrar o estado inical do tabuleiro
-    (format t"~%~tEstado Final:")
-    ;função para a solução do tabuleiro
-    (terpri t)
-    (format t"~%~t------ Fim de Execução ------")
-    (terpri t)
-    (terpri t)
+(defun write-bfs-dfs-a*-stats (solution start end stream)
+    (format stream "~% *** Solução do Tabuleiro: ***")
+    (terpri stream)
+    (format stream"~%~tInício: ~a" start)
+    (format stream"~%~tFim: ~a" end)
+    (format stream"~%~tTempo Total: ~a" (- end start))
+    (format stream"~%~tFator de ramificação média: ~a" (average-branching-factor solution (generated-nodes solution) 2))
+    (format stream"~%~tNúmero de nós gerados: ~a" (generated-nodes solution))
+    (format stream"~%~tNúmero de nós expandidos: ~a" (number-of-expanded-nodes solution)) 
+    (format stream"~%~tPenetrância: ~a" (piercing-factor solution))
+    (format stream"~%~tComprimento da solução: ~a" (solution-length solution))
+    (format stream"~%~tCaminho da solução: ~a" (solution-path solution))
+    (terpri stream)
+    (format stream"~%~t------ Fim de Execução ------")
+    (terpri stream)
+    (terpri stream)
 )
-
-
-
-;; write-a*-stats
-;; write the solution and measures for the a* algorithm
-(defun write-a*-stats (solution-list) 
-    (format t "~% *** Solução do Tabuleiro: ***")
-    (format t "~%~tAlgoritmo:" )
-    (format t "~%~tInício: ")
-    (format t "~%~tFim: " (current-time))
-    (format t "~%~tTempo Total: " (current-time))
-    (format t "~%~tFator de ramificação média: " (average-branching-factor (solution-list maximum tolerance &optional (minimum 0))))
-    (format t "~%~tNúmero de nós gerados: " (generated-nodes solution-list))
-    (format t "~%~tNúmero de nós expandidos: " (number-of-expanded-nodes solution-list))
-    (format t "~%~tPenetrância: " )
-    (format t "~%~tComprimento da solução:")
-    (format t "~%~tEstado Inicial:")
-    ;função para mostrar o estado inical do tabuleiro
-    (format t "~%~tEstado Final:")
-    ;função para a solução do tabuleiro
-    (terpri t)
-    (format t"~%~t------ Fim de Execução ------")
-    (terpri t)
-    (terpri t)
-  )
 
 
 ;; current-time
 ;; returns a list with a actual time (hours minutes seconds)
 (defun current-time()
-  (multiple-value-bind (seconds minutes hours) (get-decoded-time)
-    (format t "~d:~d:~d" hours minutes seconds)
-   )
+  (get-internal-real-time)
 )

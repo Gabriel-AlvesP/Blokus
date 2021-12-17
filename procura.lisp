@@ -456,6 +456,10 @@
   (first solution-list)
 )
 
+(defun solution-length (solution-list)
+  (length solution-list) 
+)
+
 ;; solution-path
 ;; returns all nodes that are included in the solution founded
 (defun solution-path(solution-node)
