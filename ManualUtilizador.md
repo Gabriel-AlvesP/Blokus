@@ -2,6 +2,14 @@
 
 ## Inteligência Artificial - Projeto 1
 
-André Serrado 201900318
+Grupo:
 
-Gabriel Pais 201900301
+- André Serrado 201900318
+
+- Gabriel Pais 201900301
+
+Docente:
+
+- Filipe Mariano
+
+## Índice

@@ -2,9 +2,15 @@
 
 ## Inteligência Artificial - Projeto 1
 
-André Serrado 201900318
+Grupo:
 
-Gabriel Pais 201900301
+- André Serrado 201900318
+
+- Gabriel Pais 201900301
+
+Docente:
+
+- Filipe Mariano
 
 Este manual técnico contém a documentação da implementação do projeto, Blokus Uno. Este projeto teve como principal objetivo, a procura de soluções nos tabuleiros, recorrendo à utilização de algoritmos de procura. Este projeto foi também desenvolvido, exclusivamente com a linguagem Lisp.
 
