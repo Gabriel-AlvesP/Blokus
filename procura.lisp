@@ -91,9 +91,10 @@
   (cond
     ((null operations) nil)
     ((and (equal alg 'dfs) (< g (1+ (node-depth node)))) nil)
-    (t (remove-nil (cons (car (get-children node (funcall possible-moves (node-pieces-left node) (car operations) (node-state node)) (car operations) h solution))         
-        (expand-node node possible-moves (cdr operations) alg g h solution)
-       ))
+    (t (remove-nil (append (get-children node (funcall possible-moves (node-pieces-left node) (car operations) (node-state node)) (car operations) h solution)        
+                      (expand-node node possible-moves (cdr operations) alg g h solution)
+                   )
+       )
     )
   )
 )
@@ -205,7 +206,7 @@
 
 ;; bfs
 ;; (bfs 8 (operations) (list (make-node (board-a))))
-(defun bfs (solution operations open  &optional (closed nil))
+(defun bfs (solution operations open  &optional (closed nil) (nodes-number 0) (expanded-nodes 0))
   "solution must be a number,
    operations must be a list(must use operations function)"
 
@@ -214,19 +215,20 @@
     (t (let* ( 
               (current-node (car open))
               (closed1 (cons current-node closed))
-              (filtered-children (remove-duplicated (expand-node current-node 'possible-moves operations 'bfs) 'duplicatedp open closed1))
+              (all-children (expand-node current-node 'possible-moves operations 'bfs))
+              (nodes-counter (+ (length all-children) nodes-number))
+              (filtered-children (remove-duplicated all-children 'duplicatedp open closed1))
               (open1 (append (cdr open) filtered-children))
               (first-solution (get-solution filtered-children solution))
              )
          (cond 
-          ((null first-solution) (bfs solution operations open1 closed1))
-          (t first-solution)
+          ((null first-solution) (bfs solution operations open1 closed1 nodes-counter (1+ expanded-nodes)))
+          (t (list first-solution nodes-counter (1+ expanded-nodes)))
          )
       )
     )
   )
 )
-
 
 ;;;  Algoritmo de Procura do Profundidade Primeiro (DFS)
 
@@ -297,19 +299,21 @@
 
 ;; dfs
 ;; (dfs 8 (operations) (list (make-node (board-a))) 2)
-(defun dfs (solution operations open max-g  &optional (closed nil))
+(defun dfs (solution operations open max-g  &optional (closed nil) (nodes-number 0) (expanded-nodes 0))
   (cond 
     ((null open) nil)
     (t (let* ( 
               (current-node (car open))
-              (filtered-children (remove-duplicated-dfs (expand-node current-node 'possible-moves operations 'dfs max-g) (cdr open) (cons current-node closed)))
+              (all-children (expand-node current-node 'possible-moves operations 'dfs max-g))
+              (nodes-counter (+(length all-children) nodes-number))
+              (filtered-children (remove-duplicated-dfs all-children (cdr open) (cons current-node closed)))
               (closed1 (remove-closed-duplicated filtered-children (cdr open) (cons current-node closed)))
               (open1 (append filtered-children (cdr open)))
               (first-solution (get-solution filtered-children solution))
             )
         (cond 
-          ((null first-solution) (dfs solution operations open1 max-g closed1))
-          (t  first-solution)
+          ((null first-solution) (dfs solution operations open1 max-g closed1 nodes-counter (1+ expanded-nodes)))
+          (t (list first-solution nodes-counter (1+ expanded-nodes)))
         )
       )
     )
@@ -318,7 +322,8 @@
 
 ;;;  Algoritmo de Procura do Melhor Primeiro (A*)
 
-;; 
+;; hts
+;; selects the heuristic choosed
 (defun hts (solution state h-type)
   (cond 
       ((equal h-type 'h0) 0)
@@ -393,7 +398,8 @@
 
 
 ;; check-duplicated
-;; 
+;; checks if there are some duplicated nodes in open that should be removed
+;; returns the open list without duplicated nodes
 (defun check-duplicated (expanded-nodes open)
   "[open] list with nodes"
   (let* (
@@ -403,14 +409,14 @@
     (cond
       ((null expanded-nodes) open)
       ((null duplicated-open) (check-duplicated (cdr expanded-nodes) open))  
-      (t (check-duplicated (cdr expanded-nodes) (remove duplicated-open open)))   ; remove duplicated-open from open                        
+      (t (check-duplicated (cdr expanded-nodes) (remove duplicated-open open)))                         
     )
   )
 )  
 
 ;; a* algorithm
-;; test => (a* 72 (operations) (list (make-node (board-f))) 'h1)
-(defun a* (solution operations open heuristic &optional (closed nil))
+;; test => (a* 72 (operations) (list (make-node (empty-board))) 'h1)
+(defun a* (solution operations open heuristic &optional (closed nil) (nodes-number 0) (expanded-nodes 0))
   "
   [solution] must be a number, 
   [operations] must be a list with all operations available
@@ -421,16 +427,15 @@
     (t (let* (
                (current-node (get-lowest-node (car open) open))
                (closed1 (cons current-node closed))
-               (filtered-children (to-insert-in-open 
-                 (remove-duplicated (expand-node current-node 'possible-moves operations 'a 0 heuristic solution) 'duplicatedp-a* open closed1)
-                 (cdr open))
-               )
+               (all-children (expand-node current-node 'possible-moves operations 'a 0 heuristic solution))
+               (nodes-counter (+ (length all-children) nodes-number))
+               (filtered-children (to-insert-in-open (remove-duplicated all-children 'duplicatedp-a* open closed1) (cdr open)))
                (open1 (append (check-duplicated filtered-children (cdr open)) filtered-children))
                (sol (get-solution (list current-node) solution))
              )
           (cond 
-            ((null sol) (a* solution operations open1 heuristic closed1))
-            (t sol)
+            ((null sol) (a* solution operations open1 heuristic closed1 nodes-counter (1+ expanded-nodes)))
+            (t (list sol nodes-counter (1+ expanded-nodes)))
           )
         )
     )
@@ -439,11 +444,14 @@
 
 ;;; Performance Stats
 
-
+;; solution-node
+;; returns a node that is a solution for the problem 
 (defun solution-node(solution-list)
   (first solution-list)
 )
 
+;; solution-path
+;; returns the 
 (defun solution-path(solution-list)
   (let ((final-node (solution-node solution-list)))
       (cond 
@@ -453,15 +461,41 @@
   )
 )
 
+;; number-of-expanded-nodes 
+(defun number-of-expanded-nodes (solution-list)
+  (third solution-list)
+)
+
+;; generated-nodes 
 (defun generated-nodes(solution-list)
   (second solution-list)
 )
 
-
-(defun penetrance(solution-node generated-nodes)
-  (/ (+ (node-depth solution-node) 1) generated-nodes)
+;; 
+(defun penetrance(solution-list)
+  (/ (+ (node-depth (solution-node solution-list)) 1) (generated-nodes solution-list))
 )
 
-;;;  Os algoritmos SMA*, IDA* e/ou RBFS (bonus)
+;;
+(defun branching-factor (solution-list maximum &optional (minimum 0) tolerance)
+  (let* (
+          (n-nodes (generated-nodes solution-list))
+          (g (node-depth (solution-node solution-list)))
+          (average-min-max (/ (+ maximum minimum) 2))                       ; media como fator de ramificacao 
+          (average-generated-n (average-generated-nodes average-min-max g))
+          (diff (- n-nodes average-generated-n))
+        )
+      (cond
+        ((< diff tolerance) average-min-max)
+        ((< average-generated-n n-nodes) (branching-factor solution-list maximum average-generated-n)) 
+        (t (branching-factor solution-list average-generated-n minimum)) 
+      )
+  )
+)
 
-
+(defun average-generated-nodes (average g) 
+  (cond 
+    ((= 1 g) 0)
+    (t (+ (expt average g) (average-generated-nodes average (1- g))))
+  )
+)
