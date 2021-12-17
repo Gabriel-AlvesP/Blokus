@@ -1,8 +1,6 @@
-# Manual Técnico
+# Manual Técnico - Blokus Uno
 
-## Inteligência Artificial
-
-## Blokus Uno
+## Inteligência Artificial - Projeto 1
 
 André Serrado 201900318
 
@@ -1197,6 +1195,8 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos, aos al
 )
 ```
 
+---
+
 ## **[Projeto](#projeto)**
 
 .
@@ -1204,6 +1204,8 @@ As funções auxiliares são utilizadas como suporte aos dados abstratos, aos al
 .
 
 .
+
+---
 
 ## **[Estatisticas](#estatisticas)**
 
