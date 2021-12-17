@@ -118,21 +118,21 @@
 ;; row
 ;  returns a particular row based on an index
 (defun row(index board)
-  "Index must be a number between 0 and the board dimension"
+  "[index] must be a number between 0 and the board dimension"
   (nth index board)
 )
 
 ;; column 
 ;  returns a particular column based on an index
 (defun column(index board)
-  "Index must be a number between 0 and the board dimension"
+  "[index] must be a number between 0 and the board dimension"
   (mapcar (lambda (x) (nth index x))  board) 
 )
 
 ;; element
 ;  returns a particular element based on row (r) and column (col) indexes
 (defun element(r col board)
-    "r and col must be numbers between 0 and the board dimension"
+    "[r] and [col] must be numbers between 0 and the board dimension"
   (nth col (row r board))
 )
 
@@ -144,7 +144,7 @@
 ;  empty-elemp
 ;  returns t if a board element is empty(or the value - val) and nil if it isn't
 (defun empty-elemp(row col board &optional (val 0)) 
-  "row and col must be numbers between 0 and the board dimension"
+  "[row] and [col] must be numbers between 0 and the board dimension"
   (cond 
   ((or (< row 0) (> row (1- (length board))) (< col 0) (> col (1-(length board)))) nil)
   ((= (element row col board) val) t)
@@ -170,7 +170,7 @@
 ;  replaces a position in the board for val
 ;  returns a row(list) with element in column(col) position replaced by the val
 (defun replace-pos (col row &optional (val 1)) 
-    "Col (column) must be a number between 0 and the row length"
+    "[Col] (column) must be a number between 0 and the row length"
     (cond 
      ((null row) nil)
      ((= col 0) (cons val (replace-pos (1- col) (cdr row) val)))
@@ -181,7 +181,7 @@
 ;  replaces an element in the board  
 ;  returns the all board with element replaced by the value
 (defun replace- (row col board &optional (val 1)) 
-  "Row and column must be a number between 0 and the board length"
+  "[Row] and [column] must be a number between 0 and the board length"
   (cond  
    ((null board) nil)
    ((= row 0) (cons (replace-pos col (car board) val) (replace- (1- row) col (cdr board) val)))

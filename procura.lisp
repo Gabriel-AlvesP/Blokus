@@ -509,7 +509,11 @@
 ;; average-generated-nodes
 ;; aux function to [branching-factor]
 ;; returns the generator nodes 
-(defun average-generated-nodes (average g) 
+(defun average-generated-nodes (average g)
+  "
+  [average] must be a number,
+  [g] must be a numebr
+  "
   (cond 
     ((= 1 g) 0)
     (t (+ (expt average g) (average-generated-nodes average (1- g))))
