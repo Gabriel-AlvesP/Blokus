@@ -451,7 +451,7 @@
 )
 
 ;; solution-path
-;; returns the 
+;; returns all nodes that are included in the solution founded
 (defun solution-path(solution-list)
   (let ((final-node (solution-node solution-list)))
       (cond 
@@ -462,22 +462,35 @@
 )
 
 ;; number-of-expanded-nodes 
+;; returns a number (expanded nodes)
 (defun number-of-expanded-nodes (solution-list)
+  "[solution-list] list with all execution info"
   (third solution-list)
 )
 
 ;; generated-nodes 
+;; returns a number (generated nodes)
 (defun generated-nodes(solution-list)
+  "[solution-list] list with all execution info"
   (second solution-list)
 )
 
-;; 
-(defun penetrance(solution-list)
+;; piercing-factor 
+;; represents path length per generated nodes 
+;; returns a number (piercing factor aka penetrance)
+(defun piercing-factor(solution-list)
+  "[solution-list] list with all execution info"
   (/ (+ (node-depth (solution-node solution-list)) 1) (generated-nodes solution-list))
 )
 
-;;
-(defun branching-factor (solution-list maximum &optional (minimum 0) tolerance)
+;; branching factor
+;; returns a number that represents the branching factor average for the
+(defun average-branching-factor (solution-list maximum tolerance &optional (minimum 0))
+  "
+  [solution-list] list with all execution info,
+  [maximum] value must be the result of \"generated-nodes\",
+  [tolerance] must be a number
+  "
   (let* (
           (n-nodes (generated-nodes solution-list))
           (g (node-depth (solution-node solution-list)))
@@ -487,12 +500,15 @@
         )
       (cond
         ((< diff tolerance) average-min-max)
-        ((< average-generated-n n-nodes) (branching-factor solution-list maximum average-generated-n)) 
-        (t (branching-factor solution-list average-generated-n minimum)) 
+        ((< average-generated-n n-nodes) (average-branching-factor solution-list maximum average-generated-n)) 
+        (t (average-branching-factor solution-list average-generated-n minimum)) 
       )
   )
 )
 
+;; average-generated-nodes
+;; aux function to [branching-factor]
+;; returns the generator nodes 
 (defun average-generated-nodes (average g) 
   (cond 
     ((= 1 g) 0)
